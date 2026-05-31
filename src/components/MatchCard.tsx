@@ -5,7 +5,7 @@ import { CountdownTimer } from './CountdownTimer'
 import { SoccerIcon, PinIcon, LockIcon } from './icons'
 import type { MatchWithPrediction } from '@/lib/types'
 import { isPredictionLocked } from '@/lib/scoring'
-import { getFlagUrl } from '@/lib/flags'
+import { getFlagUrl, getCountryCode, shortenTeamName } from '@/lib/flags'
 
 function formatKickoff(utc: string): string {
   return new Intl.DateTimeFormat(undefined, {
@@ -103,6 +103,8 @@ export function MatchCard({ match, onPredictionSaved }: Props) {
 
   const homeFlag = getFlagUrl(match.home_team.img_code)
   const awayFlag = getFlagUrl(match.away_team.img_code)
+  const homeCode = getCountryCode(match.home_team.img_code)
+  const awayCode = getCountryCode(match.away_team.img_code)
 
   return (
     <div
@@ -257,7 +259,8 @@ export function MatchCard({ match, onPredictionSaved }: Props) {
               whiteSpace: 'nowrap',
             }}
           >
-            {match.home_team.name}
+            <span className="hidden sm:inline">{match.home_team.name}</span>
+            <span className="sm:hidden">{homeCode ?? shortenTeamName(match.home_team.name)}</span>
           </span>
           {homeFlag && (
             <img
@@ -329,7 +332,8 @@ export function MatchCard({ match, onPredictionSaved }: Props) {
               whiteSpace: 'nowrap',
             }}
           >
-            {match.away_team.name}
+            <span className="hidden sm:inline">{match.away_team.name}</span>
+            <span className="sm:hidden">{awayCode ?? shortenTeamName(match.away_team.name)}</span>
           </span>
         </div>
       </div>

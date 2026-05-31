@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import type { MatchWithPrediction } from '@/lib/types'
-import { getFlagUrl } from '@/lib/flags'
+import { getFlagUrl, getCountryCode, shortenTeamName } from '@/lib/flags'
 
 export default function HistoryPage() {
   const [matches, setMatches] = useState<MatchWithPrediction[]>([])
@@ -95,6 +95,8 @@ export default function HistoryPage() {
           const isFinal = m.is_final
           const homeFlag = getFlagUrl(m.home_team.img_code)
           const awayFlag = getFlagUrl(m.away_team.img_code)
+          const homeCode = getCountryCode(m.home_team.img_code)
+          const awayCode = getCountryCode(m.away_team.img_code)
 
           return (
             <div
@@ -130,12 +132,18 @@ export default function HistoryPage() {
                   {homeFlag && (
                     <img src={homeFlag} alt={m.home_team.name} style={{ width: '20px', height: 'auto', borderRadius: '2px' }} />
                   )}
-                  <span style={{ fontSize: '14px', fontWeight: 600, color: '#fff' }}>{m.home_team.name}</span>
+                  <span style={{ fontSize: '14px', fontWeight: 600, color: '#fff' }}>
+                    <span className="hidden sm:inline">{m.home_team.name}</span>
+                    <span className="sm:hidden">{homeCode ?? shortenTeamName(m.home_team.name)}</span>
+                  </span>
                   <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.30)' }}>vs</span>
                   {awayFlag && (
                     <img src={awayFlag} alt={m.away_team.name} style={{ width: '20px', height: 'auto', borderRadius: '2px' }} />
                   )}
-                  <span style={{ fontSize: '14px', fontWeight: 600, color: '#fff' }}>{m.away_team.name}</span>
+                  <span style={{ fontSize: '14px', fontWeight: 600, color: '#fff' }}>
+                    <span className="hidden sm:inline">{m.away_team.name}</span>
+                    <span className="sm:hidden">{awayCode ?? shortenTeamName(m.away_team.name)}</span>
+                  </span>
                 </div>
               </div>
 

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ChevronDownIcon, LockIcon } from '@/components/icons'
 import type { MatchWithPrediction, Team } from '@/lib/types'
 import { ROUND_ORDER, ROUND_LABELS } from '@/lib/types'
-import { getFlagUrl } from '@/lib/flags'
+import { getFlagUrl, getCountryCode, shortenTeamName } from '@/lib/flags'
 import { isPredictionLocked } from '@/lib/scoring'
 
 interface ScoreState {
@@ -341,7 +341,8 @@ export default function AdminPage() {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '14px' }}>
                   <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px', minWidth: 0 }}>
                     <span style={{ fontSize: '14px', fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {match.home_team.name}
+                      <span className="hidden sm:inline">{match.home_team.name}</span>
+                      <span className="sm:hidden">{getCountryCode(match.home_team.img_code) ?? shortenTeamName(match.home_team.name)}</span>
                     </span>
                     {getFlagUrl(match.home_team.img_code) && (
                       <img src={getFlagUrl(match.home_team.img_code)!} alt={match.home_team.name} style={{ width: '24px', height: 'auto', borderRadius: '2px', flexShrink: 0 }} />
@@ -369,7 +370,8 @@ export default function AdminPage() {
                       <img src={getFlagUrl(match.away_team.img_code)!} alt={match.away_team.name} style={{ width: '24px', height: 'auto', borderRadius: '2px', flexShrink: 0 }} />
                     )}
                     <span style={{ fontSize: '14px', fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {match.away_team.name}
+                      <span className="hidden sm:inline">{match.away_team.name}</span>
+                      <span className="sm:hidden">{getCountryCode(match.away_team.img_code) ?? shortenTeamName(match.away_team.name)}</span>
                     </span>
                   </div>
                 </div>
@@ -556,7 +558,8 @@ export default function AdminPage() {
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '10px' }}>
                       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px', minWidth: 0 }}>
                         <span style={{ fontSize: '13px', fontWeight: 600, color: homeAssigned ? '#fff' : 'rgba(255,255,255,0.30)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {currentHome.name}
+                          <span className="hidden sm:inline">{currentHome.name}</span>
+                          <span className="sm:hidden">{getCountryCode(currentHome.img_code) ?? shortenTeamName(currentHome.name)}</span>
                         </span>
                         {homeAssigned && (
                           <img src={getFlagUrl(currentHome.img_code)!} alt={currentHome.name} style={{ width: '22px', height: 'auto', borderRadius: '2px', flexShrink: 0 }} />
@@ -568,7 +571,8 @@ export default function AdminPage() {
                           <img src={getFlagUrl(currentAway.img_code)!} alt={currentAway.name} style={{ width: '22px', height: 'auto', borderRadius: '2px', flexShrink: 0 }} />
                         )}
                         <span style={{ fontSize: '13px', fontWeight: 600, color: awayAssigned ? '#fff' : 'rgba(255,255,255,0.30)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {currentAway.name}
+                          <span className="hidden sm:inline">{currentAway.name}</span>
+                          <span className="sm:hidden">{getCountryCode(currentAway.img_code) ?? shortenTeamName(currentAway.name)}</span>
                         </span>
                       </div>
                     </div>
