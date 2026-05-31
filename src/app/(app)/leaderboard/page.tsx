@@ -5,17 +5,24 @@ import { SoccerIcon } from '@/components/icons'
 import { getFlagUrl } from '@/lib/flags'
 import type { LeaderboardEntry } from '@/lib/types'
 
-function ChampionCell({ entry }: { entry: LeaderboardEntry }) {
+function ChampionCell({ entry, flagSize = 18 }: { entry: LeaderboardEntry; flagSize?: number }) {
+  const valueStyle: React.CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '21px',
+    gap: '4px',
+  }
   if (!entry.champion_team) {
-    return <div style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255,255,255,0.20)' }}>–</div>
+    return <div style={{ ...valueStyle, fontSize: '14px', fontWeight: 700, color: 'rgba(255,255,255,0.20)' }}>–</div>
   }
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', justifyContent: 'center' }}>
+    <div style={valueStyle}>
       {getFlagUrl(entry.champion_team_img_code) && (
         <img
           src={getFlagUrl(entry.champion_team_img_code)!}
           alt={entry.champion_team}
-          style={{ width: '18px', height: 'auto', borderRadius: '2px', opacity: entry.champion_correct === false ? 0.4 : 1 }}
+          style={{ width: `${flagSize}px`, height: 'auto', borderRadius: '2px', opacity: entry.champion_correct === false ? 0.4 : 1 }}
         />
       )}
       {entry.champion_correct === true && (
@@ -138,7 +145,13 @@ export default function LeaderboardPage() {
                 <div style={{ fontSize: '14px', fontWeight: 700, color: '#fbbf24' }}>{entry.correct_results}</div>
               </div>
 
-              {/* Champion — desktop only */}
+              {/* Champion — mobile compact */}
+              <div className="block sm:hidden" style={{ textAlign: 'center' }}>
+                <div style={labelStyle}>Champ</div>
+                <ChampionCell entry={entry} flagSize={13} />
+              </div>
+
+              {/* Champion — desktop */}
               <div className="hidden sm:block" style={{ textAlign: 'center' }}>
                 <div style={{ ...labelStyle, marginBottom: '4px' }}>Champion</div>
                 <ChampionCell entry={entry} />
