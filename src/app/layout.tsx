@@ -5,6 +5,11 @@ export const metadata: Metadata = {
   title: 'Thinkers Cup',
   description: 'FIFA World Cup 2026 predictions pool',
   icons: { icon: '/wc26logo.webp' },
+  openGraph: {
+    title: 'Thinkers Cup',
+    description: 'FIFA World Cup 2026 predictions pool',
+    images: [{ url: '/wc26logo.webp' }],
+  },
 }
 
 export const viewport: Viewport = {
