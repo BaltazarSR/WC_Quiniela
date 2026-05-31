@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Mundial 2026 — Quiniela',
+  title: 'Thinkers Cup',
   description: 'FIFA World Cup 2026 predictions pool',
   icons: { icon: '/wc26logo.webp' },
 }
