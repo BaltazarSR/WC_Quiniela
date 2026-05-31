@@ -38,12 +38,12 @@ export const POST = withAdmin(async (req: NextRequest, { params }) => {
       .eq('match_id', id)
 
     if (predictions?.length) {
-      for (const p of predictions) {
-        await supabase
-          .from('predictions')
-          .update({ points_earned: calculatePoints(p.home_goals, p.away_goals, homeScore, awayScore) })
-          .eq('id', p.id)
-      }
+      await supabase.from('predictions').upsert(
+        predictions.map((p) => ({
+          id: p.id,
+          points_earned: calculatePoints(p.home_goals, p.away_goals, homeScore, awayScore),
+        }))
+      )
     }
   }
 

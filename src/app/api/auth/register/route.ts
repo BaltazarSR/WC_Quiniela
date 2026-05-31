@@ -7,8 +7,8 @@ import { sessionOptions, SessionData } from '@/lib/session-options'
 import { checkRateLimit } from '@/lib/rate-limit'
 
 export async function POST(request: NextRequest) {
-  const ip = request.headers.get('x-forwarded-for') ?? 'unknown'
-  if (!checkRateLimit(ip)) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  if (!checkRateLimit(`register:${ip}`)) {
     return NextResponse.json({ error: 'Too many attempts. Try again later.' }, { status: 429 })
   }
 

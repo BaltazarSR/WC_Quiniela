@@ -5,12 +5,10 @@ import { supabase } from '@/lib/supabase'
 export const GET = withAuth(async () => {
   const [
     { data: predictions, error },
-    { data: allPredictions },
     { data: settings },
     { data: champPreds },
   ] = await Promise.all([
-    supabase.from('predictions').select('user_id, points_earned').not('points_earned', 'is', null),
-    supabase.from('predictions').select('user_id, users(username)'),
+    supabase.from('predictions').select('user_id, points_earned, users(username)'),
     supabase
       .from('tournament_settings')
       .select('champion_team_id')
@@ -39,7 +37,7 @@ export const GET = withAuth(async () => {
     }
   >()
 
-  for (const p of allPredictions ?? []) {
+  for (const p of predictions ?? []) {
     const usersField = p.users as unknown as { username: string } | null
     const username = usersField?.username ?? 'Unknown'
     if (!totals.has(p.user_id)) {
@@ -54,15 +52,13 @@ export const GET = withAuth(async () => {
         champion_correct: null,
       })
     }
-    totals.get(p.user_id)!.predictions_count++
-  }
-
-  for (const p of predictions ?? []) {
-    const entry = totals.get(p.user_id)
-    if (!entry) continue
-    entry.total_points += p.points_earned ?? 0
-    if (p.points_earned === 3) entry.exact_scores++
-    if (p.points_earned === 1) entry.correct_results++
+    const entry = totals.get(p.user_id)!
+    entry.predictions_count++
+    if (p.points_earned != null) {
+      entry.total_points += p.points_earned
+      if (p.points_earned === 3) entry.exact_scores++
+      if (p.points_earned === 1) entry.correct_results++
+    }
   }
 
   // Include users who have a champion pick but no match predictions yet
