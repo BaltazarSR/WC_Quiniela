@@ -22,7 +22,7 @@ function ChampionCell({ entry, flagSize = 18 }: { entry: LeaderboardEntry; flagS
         <img
           src={getFlagUrl(entry.champion_team_img_code)!}
           alt={entry.champion_team}
-          style={{ width: `${flagSize}px`, height: 'auto', borderRadius: '2px', opacity: entry.champion_correct === false ? 0.4 : 1 }}
+          style={{ width: `${flagSize}px`, height: `${Math.round(flagSize * 0.75)}px`, display: 'block', borderRadius: '2px', opacity: entry.champion_correct === false ? 0.4 : 1 }}
         />
       )}
       {entry.champion_correct === true && (
@@ -153,7 +153,7 @@ export default function LeaderboardPage() {
 
               {/* Champion — desktop */}
               <div className="hidden sm:block" style={{ textAlign: 'center' }}>
-                <div style={{ ...labelStyle, marginBottom: '4px' }}>Champion</div>
+                <div style={labelStyle}>Champion</div>
                 <ChampionCell entry={entry} />
               </div>
 
