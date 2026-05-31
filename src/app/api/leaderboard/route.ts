@@ -18,7 +18,7 @@ export const GET = withAuth(async () => {
       .maybeSingle(),
     supabase
       .from('champion_predictions')
-      .select('user_id, team_id, team:team_id(name, img_code)'),
+      .select('user_id, team_id, team:team_id(name, img_code), users(username)'),
   ])
 
   if (error) {
@@ -66,18 +66,11 @@ export const GET = withAuth(async () => {
   }
 
   // Include users who have a champion pick but no match predictions yet
-  const missingUserIds = (champPreds ?? [])
-    .filter((cp) => !totals.has(cp.user_id))
-    .map((cp) => cp.user_id)
-
-  if (missingUserIds.length > 0) {
-    const { data: missingUsers } = await supabase
-      .from('users')
-      .select('id, username')
-      .in('id', missingUserIds)
-    for (const u of missingUsers ?? []) {
-      totals.set(u.id, {
-        username: u.username,
+  for (const cp of champPreds ?? []) {
+    if (!totals.has(cp.user_id)) {
+      const usersField = cp.users as unknown as { username: string } | null
+      totals.set(cp.user_id, {
+        username: usersField?.username ?? 'Unknown',
         total_points: 0,
         exact_scores: 0,
         correct_results: 0,

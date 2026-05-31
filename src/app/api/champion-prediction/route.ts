@@ -26,15 +26,18 @@ export const GET = withAuth(async (_req, { session }) => {
   const predTeam = pred?.team as unknown as { name: string; img_code: string | null } | null
   const champTeam = settings?.champion_team as unknown as { name: string; img_code: string | null } | null
 
-  return NextResponse.json({
-    prediction: pred
-      ? { team_id: pred.team_id, team_name: predTeam?.name ?? '', team_img_code: predTeam?.img_code ?? null }
-      : null,
-    is_locked: isLocked,
-    champion_team_id: settings?.champion_team_id ?? null,
-    champion_team_name: champTeam?.name ?? null,
-    champion_team_img_code: champTeam?.img_code ?? null,
-  })
+  return NextResponse.json(
+    {
+      prediction: pred
+        ? { team_id: pred.team_id, team_name: predTeam?.name ?? '', team_img_code: predTeam?.img_code ?? null }
+        : null,
+      is_locked: isLocked,
+      champion_team_id: settings?.champion_team_id ?? null,
+      champion_team_name: champTeam?.name ?? null,
+      champion_team_img_code: champTeam?.img_code ?? null,
+    },
+    { headers: { 'Cache-Control': 'private, max-age=30, stale-while-revalidate=60' } }
+  )
 })
 
 export const POST = withAuth(async (req: NextRequest, { session }) => {

@@ -31,5 +31,7 @@ export const GET = withAuth(async (_req, { session }) => {
     prediction: predMap.get(m.id) ?? null,
   }))
 
-  return NextResponse.json(result)
+  return NextResponse.json(result, {
+    headers: { 'Cache-Control': 'private, max-age=30, stale-while-revalidate=60' },
+  })
 })

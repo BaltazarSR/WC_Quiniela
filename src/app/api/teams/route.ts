@@ -13,5 +13,7 @@ export const GET = withAuth(async () => {
     return NextResponse.json({ error: 'Failed to fetch teams.' }, { status: 500 })
   }
 
-  return NextResponse.json(teams ?? [])
+  return NextResponse.json(teams ?? [], {
+    headers: { 'Cache-Control': 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400' },
+  })
 })
