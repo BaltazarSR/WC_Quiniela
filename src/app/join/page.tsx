@@ -115,7 +115,7 @@ export default function JoinPage() {
             </label>
             <input
               type="text"
-              placeholder="e.g. MUNDIAL2026"
+              placeholder="..."
               value={joinCode}
               onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
               required

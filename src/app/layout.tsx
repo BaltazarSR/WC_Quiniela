@@ -4,6 +4,7 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'Mundial 2026 — Quiniela',
   description: 'FIFA World Cup 2026 predictions pool',
+  icons: { icon: '/wc26logo.webp' },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

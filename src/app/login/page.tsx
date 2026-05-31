@@ -70,7 +70,7 @@ export default function LoginPage() {
               margin: 0,
             }}
           >
-            Quiniela
+            Thinkers Cup
           </h1>
           <p
             style={{

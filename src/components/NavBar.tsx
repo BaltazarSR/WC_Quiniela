@@ -69,7 +69,7 @@ export function NavBar({
             flexShrink: 0,
           }}
         >
-          Quiniela
+          Thinkers Cup
         </Link>
 
         {/* Nav links */}

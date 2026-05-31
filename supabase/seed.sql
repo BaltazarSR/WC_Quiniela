@@ -2,7 +2,7 @@
 
 -- Pool
 INSERT INTO pools (id, name, join_code)
-VALUES ('a0000000-0000-0000-0000-000000000001', 'Mundial 2026', 'MUNDIAL2026');
+VALUES ('a0000000-0000-0000-0000-000000000001', 'Mundial 2026', 'COMOPOLLITO');
 
 -- Admin user (password: admin2026)
 INSERT INTO users (username, password_hash, is_admin, pool_id)
