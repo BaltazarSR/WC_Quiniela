@@ -1,0 +1,188 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { SoccerIcon } from '@/components/icons'
+import { getFlagUrl } from '@/lib/flags'
+import type { LeaderboardEntry } from '@/lib/types'
+
+export default function LeaderboardPage() {
+  const [entries, setEntries] = useState<LeaderboardEntry[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch('/api/leaderboard')
+      .then((r) => r.json())
+      .then((data) => {
+        setEntries(data)
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
+  }, [])
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', paddingTop: '80px', color: 'rgba(255,255,255,0.30)' }}>
+        Loading…
+      </div>
+    )
+  }
+
+  const medalColors = ['#fbbf24', '#94a3b8', '#cd7c2f']
+
+  return (
+    <div>
+      <h1
+        style={{
+          fontSize: '10px',
+          fontWeight: 600,
+          textTransform: 'uppercase',
+          letterSpacing: '0.18em',
+          color: 'rgba(255,255,255,0.40)',
+          marginBottom: '16px',
+        }}
+      >
+        Leaderboard
+      </h1>
+
+      {entries.length === 0 && (
+        <p style={{ color: 'rgba(255,255,255,0.30)', textAlign: 'center', paddingTop: '40px' }}>
+          No scores yet. Predictions will be scored when matches end.
+        </p>
+      )}
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        {entries.map((entry, idx) => (
+          <div
+            key={entry.username}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '12px 16px',
+              borderRadius: '12px',
+              border: '1px solid rgba(255,255,255,0.07)',
+              background: idx === 0 ? 'rgba(251,191,36,0.04)' : 'rgba(255,255,255,0.02)',
+              gap: '12px',
+              transition: 'all 150ms',
+            }}
+          >
+            {/* Rank + username */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: 0 }}>
+              <span
+                style={{
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  color: idx < 3 ? medalColors[idx] : 'rgba(255,255,255,0.30)',
+                  width: '24px',
+                  textAlign: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                {idx + 1}
+              </span>
+              <span
+                style={{
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: '#fff',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {entry.username}
+              </span>
+            </div>
+
+            {/* Stats */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexShrink: 0 }}>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.30)', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
+                  Exact
+                </div>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#4ade80' }}>
+                  {entry.exact_scores}
+                </div>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.30)', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
+                  Correct
+                </div>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#fbbf24' }}>
+                  {entry.correct_results}
+                </div>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.30)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>
+                  Champion
+                </div>
+                {entry.champion_team ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', justifyContent: 'center' }}>
+                    {getFlagUrl(entry.champion_team_img_code) && (
+                      <img
+                        src={getFlagUrl(entry.champion_team_img_code)!}
+                        alt={entry.champion_team}
+                        style={{ width: '18px', height: 'auto', borderRadius: '2px', opacity: entry.champion_correct === false ? 0.4 : 1 }}
+                      />
+                    )}
+                    {entry.champion_correct === true && (
+                      <span style={{ fontSize: '12px', fontWeight: 700, color: '#4ade80' }}>✓</span>
+                    )}
+                    {entry.champion_correct === false && (
+                      <span style={{ fontSize: '12px', fontWeight: 700, color: 'rgba(255,255,255,0.25)' }}>✗</span>
+                    )}
+                  </div>
+                ) : (
+                  <div style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255,255,255,0.20)' }}>–</div>
+                )}
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.30)', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
+                  Picks
+                </div>
+                <div style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255,255,255,0.50)' }}>
+                  {entry.predictions_count}
+                </div>
+              </div>
+              <div
+                style={{
+                  minWidth: '52px',
+                  textAlign: 'right',
+                }}
+              >
+                <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.30)', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
+                  Points
+                </div>
+                <div
+                  style={{
+                    fontSize: '20px',
+                    fontWeight: 700,
+                    color: '#fff',
+                    lineHeight: 1,
+                  }}
+                >
+                  {entry.total_points}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <p
+        style={{
+          marginTop: '24px',
+          fontSize: '11px',
+          color: 'rgba(255,255,255,0.20)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: '5px',
+        }}
+      >
+        <SoccerIcon color="rgba(255,255,255,0.20)" size={11} />
+        Exact score = 3 pts · Correct result = 1 pt · Champion = 15 pts
+      </p>
+    </div>
+  )
+}

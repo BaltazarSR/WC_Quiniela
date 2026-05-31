@@ -1,0 +1,53 @@
+BEGIN
+
+INSERT INTO W14_STADIUM (ID, NAME, PLACE, GMT)
+VALUES (34, 'Ciudad de Mexico', 'Mexico City', -6);
+
+INSERT INTO W14_STADIUM (ID, NAME, PLACE, GMT)
+VALUES (35, 'Guadalajara', 'Guadalajara', -6);
+
+INSERT INTO W14_STADIUM (ID, NAME, PLACE, GMT)
+VALUES (36, 'Monterrey', 'Monterrey', -6);
+
+INSERT INTO W14_STADIUM (ID, NAME, PLACE, GMT)
+VALUES (37, 'Toronto', 'Toronto', -4);
+
+INSERT INTO W14_STADIUM (ID, NAME, PLACE, GMT)
+VALUES (38, 'Vancouver', 'Vancouver', -7);
+
+INSERT INTO W14_STADIUM (ID, NAME, PLACE, GMT)
+VALUES (39, 'New York New Jersey', 'New York', -4);
+
+INSERT INTO W14_STADIUM (ID, NAME, PLACE, GMT)
+VALUES (40, 'Philadelphia', 'Philadelphia', -4);
+
+INSERT INTO W14_STADIUM (ID, NAME, PLACE, GMT)
+VALUES (41, 'Boston', 'Boston', -4);
+
+INSERT INTO W14_STADIUM (ID, NAME, PLACE, GMT)
+VALUES (42, 'Atlanta', 'Atlanta', -4);
+
+INSERT INTO W14_STADIUM (ID, NAME, PLACE, GMT)
+VALUES (43, 'Miami', 'Miami', -4);
+
+INSERT INTO W14_STADIUM (ID, NAME, PLACE, GMT)
+VALUES (44, 'Dallas', 'Dallas', -5);
+
+INSERT INTO W14_STADIUM (ID, NAME, PLACE, GMT)
+VALUES (45, 'Houston', 'Houston', -5);
+
+INSERT INTO W14_STADIUM (ID, NAME, PLACE, GMT)
+VALUES (46, 'Kansas City', 'Kansas City', -5);
+
+INSERT INTO W14_STADIUM (ID, NAME, PLACE, GMT)
+VALUES (47, 'Los Angeles', 'Los Angeles', -7);
+
+INSERT INTO W14_STADIUM (ID, NAME, PLACE, GMT)
+VALUES (48, 'San Francisco Bay Area', 'San Francisco', -7);
+
+INSERT INTO W14_STADIUM (ID, NAME, PLACE, GMT)
+VALUES (49, 'Seattle', 'Seattle', -7);
+
+COMMIT;
+
+END;
