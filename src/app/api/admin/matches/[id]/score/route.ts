@@ -38,11 +38,13 @@ export const POST = withAdmin(async (req: NextRequest, { params }) => {
       .eq('match_id', id)
 
     if (predictions?.length) {
-      await supabase.from('predictions').upsert(
-        predictions.map((p) => ({
-          id: p.id,
-          points_earned: calculatePoints(p.home_goals, p.away_goals, homeScore, awayScore),
-        }))
+      await Promise.all(
+        predictions.map((p) =>
+          supabase
+            .from('predictions')
+            .update({ points_earned: calculatePoints(p.home_goals, p.away_goals, homeScore, awayScore) })
+            .eq('id', p.id)
+        )
       )
     }
   }
