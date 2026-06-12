@@ -66,6 +66,18 @@ export default function LeaderboardPage() {
 
   const medalColors = ['#fbbf24', '#94a3b8', '#cd7c2f']
 
+  const ranks: number[] = []
+  for (let i = 0; i < entries.length; i++) {
+    if (i === 0) { ranks.push(1); continue }
+    const curr = entries[i]
+    const prev = entries[i - 1]
+    if (curr.total_points === prev.total_points) {
+      ranks.push(ranks[i - 1])
+    } else {
+      ranks.push(i + 1)
+    }
+  }
+
   return (
     <div>
       <h1
@@ -88,7 +100,9 @@ export default function LeaderboardPage() {
       )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-        {entries.map((entry, idx) => (
+        {entries.map((entry, idx) => {
+          const rank = ranks[idx]
+          return (
           <div
             key={entry.username}
             style={{
@@ -98,7 +112,7 @@ export default function LeaderboardPage() {
               padding: '12px 16px',
               borderRadius: '12px',
               border: '1px solid rgba(255,255,255,0.07)',
-              background: idx === 0 ? 'rgba(251,191,36,0.04)' : 'rgba(255,255,255,0.02)',
+              background: rank === 1 ? 'rgba(251,191,36,0.04)' : 'rgba(255,255,255,0.02)',
               gap: '12px',
               transition: 'all 150ms',
             }}
@@ -109,13 +123,13 @@ export default function LeaderboardPage() {
                 style={{
                   fontSize: '14px',
                   fontWeight: 700,
-                  color: idx < 3 ? medalColors[idx] : 'rgba(255,255,255,0.30)',
+                  color: rank <= 3 ? medalColors[rank - 1] : 'rgba(255,255,255,0.30)',
                   width: '24px',
                   textAlign: 'center',
                   flexShrink: 0,
                 }}
               >
-                {idx + 1}
+                {rank}
               </span>
               <span
                 style={{
@@ -174,7 +188,7 @@ export default function LeaderboardPage() {
               </div>
             </div>
           </div>
-        ))}
+        )})}
       </div>
 
       <p

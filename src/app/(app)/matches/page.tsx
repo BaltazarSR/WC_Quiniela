@@ -96,7 +96,7 @@ export default function MatchesPage() {
       <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
         {[
           { label: 'Predictions', value: `${predictionCount} / ${matches.length}` },
-          { label: 'Scored', value: scoredCount },
+          { label: 'Completed', value: scoredCount },
           { label: 'Points', value: totalPoints },
         ].map((s) => (
           <div
