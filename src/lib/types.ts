@@ -74,6 +74,19 @@ export interface ChampionData {
   champion_team_img_code: string | null
 }
 
+export interface MatchPick {
+  username: string
+  home_goals: number
+  away_goals: number
+  points_earned: number | null
+  is_me: boolean
+}
+
+export interface MatchWithPicks extends Match {
+  picks: MatchPick[]
+  is_locked: boolean
+}
+
 // Round IDs in display order
 export const ROUND_ORDER = [1, 8, 2, 3, 4, 5, 6] as const
 
