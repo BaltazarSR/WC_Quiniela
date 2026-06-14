@@ -21,7 +21,7 @@ export const GET = withAuth(async (_req, { session }) => {
   const matches = allMatches ?? []
   if (matches.length === 0) return NextResponse.json([])
 
-  const lockCutoff = Date.now() - 5 * 60 * 1000
+  const lockCutoff = Date.now() + 5 * 60 * 1000
   const lockedIds = new Set(
     matches
       .filter((m) => !m.is_unlocked || new Date(m.kickoff_utc).getTime() <= lockCutoff)
