@@ -79,13 +79,16 @@ function PickRow({
 
       <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.08)', flexShrink: 0 }} />
 
-      <div
+      <span
         style={{
-          minWidth: '44px',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '4px',
           padding: '3px 8px',
           borderRadius: '6px',
-          textAlign: 'center',
           flexShrink: 0,
+          fontSize: '11px',
+          fontWeight: 600,
           background:
             pts === 3 ? 'rgba(74,222,128,0.12)'
             : pts === 1 ? 'rgba(251,191,36,0.12)'
@@ -98,14 +101,8 @@ function PickRow({
             : 'rgba(255,255,255,0.20)',
         }}
       >
-        <span style={{ fontSize: '11px', fontWeight: 600 }}>
-          {pts === 3 ? (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-              <SoccerIcon size={9} color="#4ade80" /> 3
-            </span>
-          ) : pts === 1 ? '✓ 1' : pts === 0 ? '✗ 0' : '–'}
-        </span>
-      </div>
+        {pts === 3 ? <><SoccerIcon size={11} color="#4ade80" /> 3</> : pts === 1 ? '✓ 1' : pts === 0 ? '✗ 0' : '–'}
+      </span>
     </div>
   )
 }
