@@ -228,6 +228,9 @@ function MatchPickCard({ match }: { match: MatchWithPicks }) {
           {myPts != null && (
             <span
               style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
                 fontSize: '11px',
                 fontWeight: 600,
                 padding: '3px 8px',
@@ -242,7 +245,7 @@ function MatchPickCard({ match }: { match: MatchWithPicks }) {
                   : 'rgba(255,255,255,0.30)',
               }}
             >
-              {myPts === 3 ? '⚽ 3' : myPts === 1 ? '✓ 1' : '✗ 0'}
+              {myPts === 3 ? <><SoccerIcon size={11} color="#4ade80" /> 3</> : myPts === 1 ? '✓ 1' : '✗ 0'}
             </span>
           )}
 
