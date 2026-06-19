@@ -572,6 +572,7 @@ export default function StandingsPage() {
   }, [])
 
   const tabStyle = (active: boolean): React.CSSProperties => ({
+    flex: 1,
     padding: '5px 16px',
     borderRadius: 6,
     fontSize: 12,
@@ -582,7 +583,7 @@ export default function StandingsPage() {
     cursor: 'pointer',
     transition: 'all 150ms',
     color: active ? '#fff' : 'rgba(255,255,255,0.40)',
-    background: active ? 'rgba(255,255,255,0.12)' : 'transparent',
+    background: active ? 'rgba(255,255,255,0.10)' : 'transparent',
   })
 
   return (
@@ -602,7 +603,7 @@ export default function StandingsPage() {
 
       {/* Section toggle */}
       <div style={{
-        display: 'inline-flex',
+        display: 'flex',
         background: 'rgba(255,255,255,0.06)',
         borderRadius: 8,
         padding: 2,
