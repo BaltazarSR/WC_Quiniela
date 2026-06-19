@@ -123,8 +123,8 @@ export function NavBar({
 
           {/* Desktop nav — hidden on mobile */}
           <nav
-            className="hidden sm:flex"
-            style={{ gap: '4px', overflowX: 'auto' }}
+            className="hidden md:flex"
+            style={{ gap: '4px' }}
           >
             {NAV_ITEMS.map(({ href, label }) => {
               const active = pathname === href
@@ -175,7 +175,7 @@ export function NavBar({
           {/* User + logout */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
             <span
-              className="hidden sm:inline"
+              className="hidden md:inline"
               style={{
                 fontSize: '12px',
                 color: 'rgba(255,255,255,0.40)',
@@ -216,7 +216,7 @@ export function NavBar({
 
       {/* ── Mobile bottom tab bar ── */}
       <nav
-        className="sm:hidden"
+        className="md:hidden"
         style={{
           position: 'fixed',
           bottom: 0,

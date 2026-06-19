@@ -15,7 +15,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div style={{ minHeight: '100vh', background: '#000' }}>
       <NavBar username={session.username} isAdmin={session.isAdmin} />
       <main
-        className="pb-20 sm:pb-6"
+        className="pb-20 md:pb-6"
         style={{
           maxWidth: '768px',
           margin: '0 auto',
