@@ -579,11 +579,12 @@ export default function StandingsPage() {
     fontWeight: 600,
     letterSpacing: '0.08em',
     textTransform: 'uppercase',
-    border: 'none',
+    border: '1px solid',
+    borderColor: active ? 'rgba(255,255,255,0.20)' : 'rgba(255,255,255,0.08)',
     cursor: 'pointer',
     transition: 'all 150ms',
     color: active ? '#fff' : 'rgba(255,255,255,0.40)',
-    background: active ? 'rgba(255,255,255,0.10)' : 'transparent',
+    background: active ? 'rgba(255,255,255,0.08)' : 'transparent',
   })
 
   return (
@@ -602,13 +603,7 @@ export default function StandingsPage() {
       </h1>
 
       {/* Section toggle */}
-      <div style={{
-        display: 'flex',
-        background: 'rgba(255,255,255,0.06)',
-        borderRadius: 8,
-        padding: 2,
-        marginBottom: 20,
-      }}>
+      <div style={{ display: 'flex', gap: 6, marginBottom: 20 }}>
         <button style={tabStyle(tab === 'groups')} onClick={() => setTab('groups')}>
           Groups
         </button>
