@@ -30,11 +30,10 @@ function PicksIcon() {
 
 function StandingsIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 2L13.4207 4.6123L16 5.16848L14.047 7.0386L14.458 10L12 8.68928L9.542 10L9.95301 7.0386L8 5.16848L10.5793 4.6123L12 2Z" />
-      <path fillRule="evenodd" clipRule="evenodd" d="M9 11V23H15V11H9ZM11 21V13H13V21H11Z" />
-      <path fillRule="evenodd" clipRule="evenodd" d="M2 16V23H8V16H2ZM4 21V18H6V21H4Z" />
-      <path fillRule="evenodd" clipRule="evenodd" d="M16 18V23H22V18H16ZM18 21V20H20V21H18Z" />
+    <svg width="20" height="12" viewBox="0 0 20 12" fill="currentColor">
+      <path fillRule="evenodd" clipRule="evenodd" d="M7 0V12H13V0H7ZM9 10V2H11V10H9Z" />
+      <path fillRule="evenodd" clipRule="evenodd" d="M0 5V12H6V5H0ZM2 10V7H4V10H2Z" />
+      <path fillRule="evenodd" clipRule="evenodd" d="M14 7V12H20V7H14ZM16 10V9H18V10H16Z" />
     </svg>
   )
 }
