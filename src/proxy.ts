@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { unsealData } from 'iron-session'
 import type { SessionData } from '@/lib/session-options'
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   if (
@@ -24,6 +24,7 @@ export async function middleware(request: NextRequest) {
   try {
     const data = await unsealData<SessionData>(cookie, {
       password: process.env.SESSION_SECRET!,
+      ttl: 60 * 60 * 24 * 365,
     })
     if (!data.userId) throw new Error()
     return NextResponse.next()
