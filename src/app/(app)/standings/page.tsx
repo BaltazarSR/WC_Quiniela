@@ -572,8 +572,8 @@ export default function StandingsPage() {
   }, [])
 
   const tabStyle = (active: boolean): React.CSSProperties => ({
-    padding: '6px 16px',
-    borderRadius: 8,
+    padding: '5px 16px',
+    borderRadius: 6,
     fontSize: 12,
     fontWeight: 600,
     letterSpacing: '0.08em',
@@ -582,7 +582,7 @@ export default function StandingsPage() {
     cursor: 'pointer',
     transition: 'all 150ms',
     color: active ? '#fff' : 'rgba(255,255,255,0.40)',
-    background: active ? 'rgba(255,255,255,0.10)' : 'transparent',
+    background: active ? 'rgba(255,255,255,0.12)' : 'transparent',
   })
 
   return (
@@ -600,8 +600,14 @@ export default function StandingsPage() {
         Standings
       </h1>
 
-      {/* Section tabs */}
-      <div style={{ display: 'flex', gap: 4, marginBottom: 20 }}>
+      {/* Section toggle */}
+      <div style={{
+        display: 'inline-flex',
+        background: 'rgba(255,255,255,0.06)',
+        borderRadius: 8,
+        padding: 2,
+        marginBottom: 20,
+      }}>
         <button style={tabStyle(tab === 'groups')} onClick={() => setTab('groups')}>
           Groups
         </button>
