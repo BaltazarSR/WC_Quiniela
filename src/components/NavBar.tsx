@@ -28,6 +28,14 @@ function PicksIcon() {
   )
 }
 
+function StandingsIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M8 10H4a1 1 0 0 0-1 1v9h6v-9a1 1 0 0 0-1-1zm6-6h-4a1 1 0 0 0-1 1v15h6V5a1 1 0 0 0-1-1zm6 3h-4a1 1 0 0 0-1 1v12h6V8a1 1 0 0 0-1-1z" />
+    </svg>
+  )
+}
+
 function WrenchIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -38,6 +46,7 @@ function WrenchIcon() {
 
 const NAV_ITEMS = [
   { href: '/matches', label: 'Matches', Icon: SoccerBallIcon },
+  { href: '/standings', label: 'Standings', Icon: StandingsIcon },
   { href: '/leaderboard', label: 'Ranking', Icon: TrophyIcon },
   { href: '/history', label: 'Picks', Icon: PicksIcon },
 ]
