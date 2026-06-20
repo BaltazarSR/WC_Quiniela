@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { SoccerIcon } from '@/components/icons'
 import { getFlagUrl } from '@/lib/flags'
 import type { LeaderboardEntry } from '@/lib/types'
@@ -63,6 +63,19 @@ export default function LeaderboardPage() {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [mexicoMode, setMexicoMode] = useState(false)
+  const audioRef = useRef<HTMLAudioElement>(null)
+
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+    if (mexicoMode) {
+      audio.currentTime = 0
+      audio.play()
+    } else {
+      audio.pause()
+      audio.currentTime = 0
+    }
+  }, [mexicoMode])
 
   useEffect(() => {
     fetch('/api/leaderboard')
@@ -98,6 +111,8 @@ export default function LeaderboardPage() {
 
   return (
     <div>
+      <audio ref={audioRef} src="/cucaracha_song.mp3" loop />
+
       {mexicoMode && (
         <>
           <style>{`
