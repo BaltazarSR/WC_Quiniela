@@ -37,6 +37,21 @@ function ChampionCell({ entry, flagSize = 18, mexicoMode = false }: { entry: Lea
   )
 }
 
+const CUCARACHAS = [
+  { top: '8%',  dir: 'ltr', size: 110, duration: 7,  delay: 0   },
+  { top: '18%', dir: 'rtl', size: 95,  duration: 9,  delay: 1.5 },
+  { top: '30%', dir: 'ltr', size: 125, duration: 6,  delay: 0.5 },
+  { top: '42%', dir: 'rtl', size: 88,  duration: 11, delay: 2   },
+  { top: '55%', dir: 'ltr', size: 118, duration: 8,  delay: 1   },
+  { top: '65%', dir: 'rtl', size: 102, duration: 7,  delay: 3   },
+  { top: '75%', dir: 'ltr', size: 95,  duration: 10, delay: 0.8 },
+  { top: '85%', dir: 'rtl', size: 110, duration: 6,  delay: 2.5 },
+  { top: '24%', dir: 'ltr', size: 80,  duration: 12, delay: 4   },
+  { top: '48%', dir: 'rtl', size: 130, duration: 7,  delay: 1.2 },
+  { top: '70%', dir: 'ltr', size: 102, duration: 9,  delay: 3.5 },
+  { top: '90%', dir: 'rtl', size: 90,  duration: 8,  delay: 0.3 },
+] as const
+
 const labelStyle: React.CSSProperties = {
   fontSize: '10px',
   color: 'rgba(255,255,255,0.30)',
@@ -83,6 +98,35 @@ export default function LeaderboardPage() {
 
   return (
     <div>
+      {mexicoMode && (
+        <>
+          <style>{`
+            @keyframes cucaracha-ltr {
+              from { transform: translateX(-120px); }
+              to   { transform: translateX(calc(100vw + 120px)); }
+            }
+            @keyframes cucaracha-rtl {
+              from { transform: translateX(calc(100vw + 120px)) scaleX(-1); }
+              to   { transform: translateX(-120px) scaleX(-1); }
+            }
+          `}</style>
+          <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 9999, overflow: 'hidden' }}>
+            {CUCARACHAS.map((c, i) => (
+              <img
+                key={i}
+                src="/cucaracha.gif"
+                alt=""
+                style={{
+                  position: 'absolute',
+                  top: c.top,
+                  width: `${c.size}px`,
+                  animation: `cucaracha-${c.dir} ${c.duration}s ${c.delay}s linear infinite backwards`,
+                }}
+              />
+            ))}
+          </div>
+        </>
+      )}
       <h1
         style={{
           fontSize: '10px',
