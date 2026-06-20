@@ -31,6 +31,22 @@ export function LockIcon({ color = 'white', size = 16, style }: IconProps) {
   )
 }
 
+export function CloseIcon({ color = 'white', size = 16, style }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ color, flexShrink: 0, ...style }}>
+      <path d="M10.5838 12L4.92688 6.34311L6.34109 4.92889L11.998 10.5858L17.6549 4.92889L19.0691 6.34311L13.4122 12L19.069 17.6568L17.6548 19.071L11.998 13.4142L6.3412 19.071L4.92699 17.6568L10.5838 12Z" fill="currentColor" />
+    </svg>
+  )
+}
+
+export function CheckIcon({ color = 'white', size = 16, style }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ color, flexShrink: 0, ...style }}>
+      <path fillRule="evenodd" clipRule="evenodd" d="M21.2054 6.70712L8.99824 18.9142L2.29114 12.2071L3.70535 10.7929L8.99824 16.0858L19.7911 5.29291L21.2054 6.70712Z" fill="currentColor" />
+    </svg>
+  )
+}
+
 export function ChevronDownIcon({ color = 'white', size = 16, style }: IconProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ color, flexShrink: 0, ...style }}>

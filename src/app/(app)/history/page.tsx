@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import type { MatchWithPicks } from '@/lib/types'
 import { getFlagUrl, getCountryCode, shortenTeamName } from '@/lib/flags'
-import { ChevronDownIcon, SoccerIcon } from '@/components/icons'
+import { CheckIcon, CloseIcon, ChevronDownIcon, SoccerIcon } from '@/components/icons'
 
 type Filter = 1 | 2 | 3 | 4 | 5 | 6 | 8
 
@@ -79,30 +79,31 @@ function PickRow({
 
       <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.08)', flexShrink: 0 }} />
 
-      <span
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '4px',
-          padding: '3px 8px',
-          borderRadius: '6px',
-          flexShrink: 0,
-          fontSize: '11px',
-          fontWeight: 600,
-          background:
-            pts === 3 ? 'rgba(74,222,128,0.12)'
-            : pts === 1 ? 'rgba(251,191,36,0.12)'
-            : pts === 0 ? 'rgba(255,255,255,0.04)'
-            : 'transparent',
-          color:
-            pts === 3 ? '#4ade80'
-            : pts === 1 ? '#fbbf24'
-            : pts === 0 ? 'rgba(255,255,255,0.25)'
-            : 'rgba(255,255,255,0.20)',
-        }}
-      >
-        {pts === 3 ? <><SoccerIcon size={11} color="#4ade80" /> 3</> : pts === 1 ? '✓ 1' : pts === 0 ? '✗ 0' : '–'}
-      </span>
+      <div style={{ width: '56px', display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+            padding: '3px 8px',
+            borderRadius: '6px',
+            fontSize: '11px',
+            fontWeight: 600,
+            background:
+              pts === 3 ? 'rgba(74,222,128,0.12)'
+              : pts === 1 ? 'rgba(251,191,36,0.12)'
+              : pts === 0 ? 'rgba(255,255,255,0.04)'
+              : 'transparent',
+            color:
+              pts === 3 ? '#4ade80'
+              : pts === 1 ? '#fbbf24'
+              : pts === 0 ? 'rgba(255,255,255,0.25)'
+              : 'rgba(255,255,255,0.20)',
+          }}
+        >
+          {pts === 3 ? <><SoccerIcon size={11} color="#4ade80" /> 3</> : pts === 1 ? <><CheckIcon size={11} color="#fbbf24" /> 1</> : pts === 0 ? <><CloseIcon size={11} color="rgba(255,255,255,0.25)" /> 0</> : '–'}
+        </span>
+      </div>
     </div>
   )
 }
@@ -242,7 +243,7 @@ function MatchPickCard({ match }: { match: MatchWithPicks }) {
                   : 'rgba(255,255,255,0.30)',
               }}
             >
-              {myPts === 3 ? <><SoccerIcon size={11} color="#4ade80" /> 3</> : myPts === 1 ? '✓ 1' : '✗ 0'}
+              {myPts === 3 ? <><SoccerIcon size={11} color="#4ade80" /> 3</> : myPts === 1 ? <><CheckIcon size={11} color="#fbbf24" /> 1</> : <><CloseIcon size={11} color="rgba(255,255,255,0.30)" /> 0</>}
             </span>
           )}
 
@@ -292,9 +293,9 @@ function MatchPickCard({ match }: { match: MatchWithPicks }) {
               >
                 <span>Player</span>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                  <span style={{ textAlign: 'center', minWidth: '44px' }}>Pick</span>
+                  <span style={{ textAlign: 'center', width: '44px' }}>Pick</span>
                   <div style={{ width: '1px', height: '12px', background: 'rgba(255,255,255,0.08)' }} />
-                  <span style={{ textAlign: 'center', minWidth: '44px' }}>Pts</span>
+                  <span style={{ textAlign: 'center', width: '56px' }}>Pts</span>
                 </div>
               </div>
               {match.picks.map((pick) => (
