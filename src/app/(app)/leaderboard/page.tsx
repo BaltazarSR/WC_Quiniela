@@ -5,7 +5,7 @@ import { SoccerIcon } from '@/components/icons'
 import { getFlagUrl } from '@/lib/flags'
 import type { LeaderboardEntry } from '@/lib/types'
 
-function ChampionCell({ entry, flagSize = 18 }: { entry: LeaderboardEntry; flagSize?: number }) {
+function ChampionCell({ entry, flagSize = 18, mexicoMode = false }: { entry: LeaderboardEntry; flagSize?: number; mexicoMode?: boolean }) {
   const valueStyle: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
@@ -13,22 +13,24 @@ function ChampionCell({ entry, flagSize = 18 }: { entry: LeaderboardEntry; flagS
     height: '21px',
     gap: '4px',
   }
-  if (!entry.champion_team) {
+  const imgCode = mexicoMode ? 'MX' : entry.champion_team_img_code
+  const teamName = mexicoMode ? 'Mexico' : entry.champion_team
+  if (!mexicoMode && !entry.champion_team) {
     return <div style={{ ...valueStyle, fontSize: '14px', fontWeight: 700, color: 'rgba(255,255,255,0.20)' }}>–</div>
   }
   return (
     <div style={valueStyle}>
-      {getFlagUrl(entry.champion_team_img_code) && (
+      {getFlagUrl(imgCode) && (
         <img
-          src={getFlagUrl(entry.champion_team_img_code)!}
-          alt={entry.champion_team}
-          style={{ width: `${flagSize}px`, height: `${Math.round(flagSize * 0.75)}px`, display: 'block', borderRadius: '2px', opacity: entry.champion_correct === false ? 0.4 : 1 }}
+          src={getFlagUrl(imgCode)!}
+          alt={teamName ?? ''}
+          style={{ width: `${flagSize}px`, height: `${Math.round(flagSize * 0.75)}px`, display: 'block', borderRadius: '2px', opacity: !mexicoMode && entry.champion_correct === false ? 0.4 : 1 }}
         />
       )}
-      {entry.champion_correct === true && (
+      {!mexicoMode && entry.champion_correct === true && (
         <span style={{ fontSize: '12px', fontWeight: 700, color: '#4ade80' }}>✓</span>
       )}
-      {entry.champion_correct === false && (
+      {!mexicoMode && entry.champion_correct === false && (
         <span style={{ fontSize: '12px', fontWeight: 700, color: 'rgba(255,255,255,0.25)' }}>✗</span>
       )}
     </div>
@@ -45,6 +47,7 @@ const labelStyle: React.CSSProperties = {
 export default function LeaderboardPage() {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([])
   const [loading, setLoading] = useState(true)
+  const [mexicoMode, setMexicoMode] = useState(false)
 
   useEffect(() => {
     fetch('/api/leaderboard')
@@ -162,13 +165,13 @@ export default function LeaderboardPage() {
               {/* Champion — mobile compact */}
               <div className="block sm:hidden" style={{ textAlign: 'center' }}>
                 <div style={labelStyle}>Champ</div>
-                <ChampionCell entry={entry} flagSize={13} />
+                <ChampionCell entry={entry} flagSize={13} mexicoMode={mexicoMode} />
               </div>
 
               {/* Champion — desktop */}
               <div className="hidden sm:block" style={{ textAlign: 'center' }}>
                 <div style={labelStyle}>Champion</div>
-                <ChampionCell entry={entry} />
+                <ChampionCell entry={entry} mexicoMode={mexicoMode} />
               </div>
 
               {/* Picks — desktop only */}
@@ -205,6 +208,27 @@ export default function LeaderboardPage() {
         <SoccerIcon color="rgba(255,255,255,0.20)" size={11} />
         Exact score = 3 pts · Correct result = 1 pt · Champion = 15 pts
       </p>
+
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
+        <button
+          onClick={() => setMexicoMode(m => !m)}
+          style={{
+            padding: '5px 10px',
+            borderRadius: '6px',
+            border: mexicoMode ? '1px solid #006847' : '1px solid rgba(255,255,255,0.10)',
+            background: mexicoMode ? 'rgba(0,104,71,0.20)' : 'rgba(255,255,255,0.04)',
+            color: mexicoMode ? '#4ade80' : 'rgba(255,255,255,0.40)',
+            fontSize: '8px',
+            fontWeight: 700,
+            letterSpacing: '0.10em',
+            cursor: 'pointer',
+            transition: 'all 200ms',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {mexicoMode ? 'VIVA MÉXICO' : 'IMAGINEMOS COSAS CHINGONAS'}
+        </button>
+      </div>
     </div>
   )
 }
