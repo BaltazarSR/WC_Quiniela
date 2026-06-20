@@ -394,8 +394,18 @@ function TeamRow({
 
 // ── Bracket section ────────────────────────────────────────────────────────────
 
+const BRACKET_ORDER: Record<number, number[]> = {
+  8: [74, 77, 73, 75, 83, 84, 81, 82, 76, 78, 79, 80, 86, 88, 85, 87],
+  2: [89, 90, 93, 94, 91, 92, 95, 96],
+}
+
 function BracketSection({ matches }: { matches: BracketMatch[] }) {
-  const byRound = (id: number) => matches.filter((m) => m.round.id === id).sort((a, b) => a.id - b.id)
+  const byRound = (roundId: number) => {
+    const order = BRACKET_ORDER[roundId]
+    return matches
+      .filter((m) => m.round.id === roundId)
+      .sort((a, b) => order ? order.indexOf(a.id) - order.indexOf(b.id) : a.id - b.id)
+  }
 
   const r32 = byRound(8)
   const r16 = byRound(2)
