@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { motion } from 'framer-motion'
 import { SoccerIcon } from '@/components/icons'
 import { getFlagUrl } from '@/lib/flags'
 import type { LeaderboardEntry } from '@/lib/types'
@@ -63,6 +64,11 @@ export default function LeaderboardPage() {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [mexicoMode, setMexicoMode] = useState(false)
+  const [currentUsername, setCurrentUsername] = useState<string | null>(null)
+  const [penalty, setPenalty] = useState(0)
+  const [splashed, setSplashed] = useState<Set<number>>(new Set())
+  const [splats, setSplats] = useState<Array<{ id: number; x: number; y: number; size: number; dir: string }>>([])
+  const splatIdRef = useRef(0)
   const audioRef = useRef<HTMLAudioElement>(null)
 
   useEffect(() => {
@@ -78,10 +84,31 @@ export default function LeaderboardPage() {
   }, [mexicoMode])
 
   useEffect(() => {
-    fetch('/api/leaderboard')
-      .then((r) => r.json())
-      .then((data) => {
-        setEntries(data)
+    if (!mexicoMode) {
+      setSplashed(new Set())
+      setSplats([])
+      setPenalty(0)
+    }
+  }, [mexicoMode])
+
+  function handleSquish(i: number, e: React.MouseEvent<HTMLImageElement>) {
+    if (splashed.has(i)) return
+    setSplashed(prev => new Set(prev).add(i))
+    setPenalty(p => p + 3)
+    const id = splatIdRef.current++
+    const c = CUCARACHAS[i]
+    setSplats(prev => [...prev, { id, x: e.clientX, y: e.clientY, size: c.size, dir: c.dir }])
+    setTimeout(() => setSplats(prev => prev.filter(s => s.id !== id)), 900)
+  }
+
+  useEffect(() => {
+    Promise.all([
+      fetch('/api/leaderboard').then((r) => r.json()),
+      fetch('/api/auth/me').then((r) => r.json()),
+    ])
+      .then(([leaderboardData, meData]) => {
+        setEntries(leaderboardData)
+        setCurrentUsername(meData.username ?? null)
         setLoading(false)
       })
       .catch(() => setLoading(false))
@@ -97,11 +124,18 @@ export default function LeaderboardPage() {
 
   const medalColors = ['#fbbf24', '#94a3b8', '#cd7c2f']
 
+  const displayEntries = [...entries]
+    .map(e => ({
+      ...e,
+      total_points: e.username === currentUsername ? e.total_points - penalty : e.total_points,
+    }))
+    .sort((a, b) => b.total_points - a.total_points)
+
   const ranks: number[] = []
-  for (let i = 0; i < entries.length; i++) {
+  for (let i = 0; i < displayEntries.length; i++) {
     if (i === 0) { ranks.push(1); continue }
-    const curr = entries[i]
-    const prev = entries[i - 1]
+    const curr = displayEntries[i]
+    const prev = displayEntries[i - 1]
     if (curr.total_points === prev.total_points) {
       ranks.push(ranks[i - 1])
     } else {
@@ -124,6 +158,24 @@ export default function LeaderboardPage() {
               from { transform: translateX(calc(100vw + 120px)) scaleX(-1); }
               to   { transform: translateX(-120px) scaleX(-1); }
             }
+            @keyframes cucaracha-splat-ltr {
+              0%   { transform: scaleX(1)    scaleY(1);    opacity: 1; }
+              15%  { transform: scaleX(1.3)  scaleY(1.2);  opacity: 1; }
+              40%  { transform: scaleX(1.9)  scaleY(0.22); filter: hue-rotate(320deg) saturate(2) brightness(0.45); opacity: 1; }
+              75%  { transform: scaleX(2.3)  scaleY(0.10); opacity: 0.5; }
+              100% { transform: scaleX(2.6)  scaleY(0.06); opacity: 0; }
+            }
+            @keyframes cucaracha-splat-rtl {
+              0%   { transform: scaleX(-1)   scaleY(1);    opacity: 1; }
+              15%  { transform: scaleX(-1.3) scaleY(1.2);  opacity: 1; }
+              40%  { transform: scaleX(-1.9) scaleY(0.22); filter: hue-rotate(320deg) saturate(2) brightness(0.45); opacity: 1; }
+              75%  { transform: scaleX(-2.3) scaleY(0.10); opacity: 0.5; }
+              100% { transform: scaleX(-2.6) scaleY(0.06); opacity: 0; }
+            }
+            @keyframes score-float {
+              0%   { opacity: 1; transform: translateX(-50%) translateY(0); }
+              100% { opacity: 0; transform: translateX(-50%) translateY(-64px); }
+            }
           `}</style>
           <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 9999, overflow: 'hidden' }}>
             {CUCARACHAS.map((c, i) => (
@@ -131,13 +183,56 @@ export default function LeaderboardPage() {
                 key={i}
                 src="/cucaracha.gif"
                 alt=""
+                onClick={(e) => handleSquish(i, e)}
                 style={{
                   position: 'absolute',
                   top: c.top,
                   width: `${c.size}px`,
+                  cursor: 'crosshair',
+                  pointerEvents: splashed.has(i) ? 'none' : 'auto',
+                  opacity: splashed.has(i) ? 0 : 1,
+                  transition: 'opacity 0.08s',
                   animation: `cucaracha-${c.dir} ${c.duration}s ${c.delay}s linear infinite backwards`,
                 }}
               />
+            ))}
+
+            {splats.map((splat) => (
+              <div
+                key={splat.id}
+                style={{
+                  position: 'fixed',
+                  left: splat.x,
+                  top: splat.y,
+                  transform: 'translate(-50%, -50%)',
+                  pointerEvents: 'none',
+                }}
+              >
+                <img
+                  src="/cucaracha.gif"
+                  alt=""
+                  style={{
+                    display: 'block',
+                    width: `${splat.size}px`,
+                    animation: `cucaracha-splat-${splat.dir} 0.85s ease-out forwards`,
+                  }}
+                />
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: '-36px',
+                    left: 0,
+                    fontSize: '16px',
+                    fontWeight: 800,
+                    color: '#ef4444',
+                    textShadow: '0 1px 8px rgba(0,0,0,1)',
+                    whiteSpace: 'nowrap',
+                    animation: 'score-float 0.85s ease-out forwards',
+                  }}
+                >
+                  -3 pts
+                </span>
+              </div>
             ))}
           </div>
         </>
@@ -162,11 +257,13 @@ export default function LeaderboardPage() {
       )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-        {entries.map((entry, idx) => {
+        {displayEntries.map((entry, idx) => {
           const rank = ranks[idx]
           return (
-          <div
+          <motion.div
             key={entry.username}
+            layout
+            transition={{ type: 'spring', stiffness: 400, damping: 35 }}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -176,7 +273,6 @@ export default function LeaderboardPage() {
               border: '1px solid rgba(255,255,255,0.07)',
               background: rank === 1 ? 'rgba(251,191,36,0.04)' : 'rgba(255,255,255,0.02)',
               gap: '12px',
-              transition: 'all 150ms',
             }}
           >
             {/* Rank + username */}
@@ -249,7 +345,7 @@ export default function LeaderboardPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         )})}
       </div>
 
