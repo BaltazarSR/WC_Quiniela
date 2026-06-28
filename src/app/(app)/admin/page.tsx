@@ -56,7 +56,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true)
   const [scoreStates, setScoreStates] = useState<Record<number, ScoreState>>({})
   const [teamStates, setTeamStates] = useState<Record<number, TeamState>>({})
-  const [roundFilter, setRoundFilter] = useState<number>(0)
+  const [roundFilter, setRoundFilter] = useState<number>(8)
   const [teamRoundFilter, setTeamRoundFilter] = useState<number>(0)
   const [champTeamId, setChampTeamId] = useState<number | null>(null)
   const [champSelectId, setChampSelectId] = useState<number | ''>('')
