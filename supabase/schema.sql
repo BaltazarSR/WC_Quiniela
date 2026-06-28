@@ -83,7 +83,8 @@ create table if not exists predictions (
 -- Tournament settings (single row: id = 1)
 create table if not exists tournament_settings (
   id integer primary key default 1,
-  champion_team_id integer references teams(id)
+  champion_team_id integer references teams(id),
+  default_round_id integer references rounds(id) default 8
 );
 insert into tournament_settings (id) values (1) on conflict do nothing;
 

@@ -56,26 +56,34 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true)
   const [scoreStates, setScoreStates] = useState<Record<number, ScoreState>>({})
   const [teamStates, setTeamStates] = useState<Record<number, TeamState>>({})
-  const [roundFilter, setRoundFilter] = useState<number>(0)
-  const [teamRoundFilter, setTeamRoundFilter] = useState<number>(0)
+  const [roundFilter, setRoundFilter] = useState<number>(8)
+  const [teamRoundFilter, setTeamRoundFilter] = useState<number>(8)
   const [champTeamId, setChampTeamId] = useState<number | null>(null)
   const [champSelectId, setChampSelectId] = useState<number | ''>('')
   const [champSaving, setChampSaving] = useState(false)
   const [champSaved, setChampSaved] = useState(false)
   const [champError, setChampError] = useState('')
+  const [defaultRoundId, setDefaultRoundId] = useState<number>(8)
+  const [defaultRoundSelectId, setDefaultRoundSelectId] = useState<number>(8)
+  const [defaultRoundSaving, setDefaultRoundSaving] = useState(false)
+  const [defaultRoundSaved, setDefaultRoundSaved] = useState(false)
+  const [defaultRoundError, setDefaultRoundError] = useState('')
 
   useEffect(() => {
     Promise.all([
       fetch('/api/matches').then((r) => r.json()),
       fetch('/api/teams').then((r) => r.json()),
       fetch('/api/champion-prediction').then((r) => r.json()).catch(() => null),
-    ]).then(([matchData, teamData, champData]: [MatchWithPrediction[], Team[], { champion_team_id: number | null } | null]) => {
+      fetch('/api/settings').then((r) => r.json()).catch(() => ({ defaultRoundId: 8 })),
+    ]).then(([matchData, teamData, champData, settingsData]: [MatchWithPrediction[], Team[], { champion_team_id: number | null } | null, { defaultRoundId: number }]) => {
       setMatches(matchData)
       setTeams(teamData)
       if (champData?.champion_team_id != null) {
         setChampTeamId(champData.champion_team_id)
         setChampSelectId(champData.champion_team_id)
       }
+      setDefaultRoundId(settingsData.defaultRoundId ?? 8)
+      setDefaultRoundSelectId(settingsData.defaultRoundId ?? 8)
 
       const scores: Record<number, ScoreState> = {}
       const tms: Record<number, TeamState> = {}
@@ -212,6 +220,25 @@ export default function AdminPage() {
     if (!res.ok) return
     setChampTeamId(null)
     setChampSelectId('')
+  }
+
+  async function handleSetDefaultRound() {
+    setDefaultRoundError('')
+    setDefaultRoundSaving(true)
+    const res = await fetch('/api/admin/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ defaultRoundId: defaultRoundSelectId }),
+    })
+    setDefaultRoundSaving(false)
+    if (!res.ok) {
+      const d = await res.json()
+      setDefaultRoundError(d.error ?? 'Failed.')
+      return
+    }
+    setDefaultRoundId(defaultRoundSelectId)
+    setDefaultRoundSaved(true)
+    setTimeout(() => setDefaultRoundSaved(false), 2000)
   }
 
   async function handleToggleUnlock(match: MatchWithPrediction) {
@@ -448,6 +475,49 @@ export default function AdminPage() {
             ))}
           </select>
         </SelectWrap>
+      </div>
+
+      {/* Default stage setting */}
+      <div
+        style={{
+          padding: '16px',
+          borderRadius: '12px',
+          border: '1px solid rgba(255,255,255,0.08)',
+          background: 'rgba(255,255,255,0.02)',
+          marginBottom: '16px',
+        }}
+      >
+        <div style={{ fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.15em', color: 'rgba(255,255,255,0.40)', marginBottom: '12px' }}>
+          Default Stage for All Users
+        </div>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <SelectWrap flex={1}>
+            <select
+              value={defaultRoundSelectId}
+              onChange={(e) => setDefaultRoundSelectId(Number(e.target.value))}
+              style={selectS}
+            >
+              {ROUND_ORDER.map((id) => (
+                <option key={id} value={id}>{ROUND_LABELS[id]}</option>
+              ))}
+            </select>
+          </SelectWrap>
+          <button
+            onClick={handleSetDefaultRound}
+            disabled={defaultRoundSaving || defaultRoundSelectId === defaultRoundId}
+            style={{
+              flexShrink: 0, height: '36px', padding: '0 14px', borderRadius: '8px', border: 'none',
+              background: defaultRoundSaved ? 'rgba(74,222,128,0.15)' : 'linear-gradient(to right, #042C8F, #498B36)',
+              color: defaultRoundSaved ? '#4ade80' : '#fff', fontSize: '11px', fontWeight: 600,
+              letterSpacing: '0.08em', textTransform: 'uppercase',
+              cursor: defaultRoundSaving || defaultRoundSelectId === defaultRoundId ? 'not-allowed' : 'pointer',
+              opacity: defaultRoundSaving || defaultRoundSelectId === defaultRoundId ? 0.5 : 1, transition: 'all 150ms',
+            }}
+          >
+            {defaultRoundSaving ? '…' : defaultRoundSaved ? '✓ Saved' : 'Set Default'}
+          </button>
+        </div>
+        {defaultRoundError && <p style={{ marginTop: '8px', fontSize: '12px', color: '#ff6b6b' }}>{defaultRoundError}</p>}
       </div>
 
       {/* Champion setting */}

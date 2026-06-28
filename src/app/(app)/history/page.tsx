@@ -324,19 +324,20 @@ function MatchPickCard({ match }: { match: MatchWithPicks }) {
 export default function HistoryPage() {
   const [matches, setMatches] = useState<MatchWithPicks[]>([])
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState<Filter>(1)
+  const [filter, setFilter] = useState<Filter | null>(null)
 
   useEffect(() => {
-    fetch('/api/picks')
-      .then((r) => r.json())
-      .then((data: MatchWithPicks[]) => {
-        setMatches(data)
-        setLoading(false)
-      })
-      .catch(() => setLoading(false))
+    Promise.all([
+      fetch('/api/picks').then((r) => r.json()),
+      fetch('/api/settings').then((r) => r.json()).catch(() => ({ defaultRoundId: 8 })),
+    ]).then(([picksData, settings]: [MatchWithPicks[], { defaultRoundId: number }]) => {
+      setMatches(picksData)
+      setFilter((settings.defaultRoundId ?? 8) as Filter)
+      setLoading(false)
+    }).catch(() => setLoading(false))
   }, [])
 
-  if (loading) {
+  if (loading || filter === null) {
     return (
       <div style={{ textAlign: 'center', paddingTop: '80px', color: 'rgba(255,255,255,0.30)' }}>
         Loading…

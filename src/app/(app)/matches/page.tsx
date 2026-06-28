@@ -34,16 +34,17 @@ function groupMatchesByDate(matches: MatchWithPrediction[]) {
 export default function MatchesPage() {
   const [matches, setMatches] = useState<MatchWithPrediction[]>([])
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState<Filter>(1)
+  const [filter, setFilter] = useState<Filter | null>(null)
 
   useEffect(() => {
-    fetch('/api/matches')
-      .then((r) => r.json())
-      .then((data) => {
-        setMatches(data)
-        setLoading(false)
-      })
-      .catch(() => setLoading(false))
+    Promise.all([
+      fetch('/api/matches').then((r) => r.json()),
+      fetch('/api/settings').then((r) => r.json()).catch(() => ({ defaultRoundId: 8 })),
+    ]).then(([matchData, settings]) => {
+      setMatches(matchData)
+      setFilter((settings.defaultRoundId ?? 8) as Filter)
+      setLoading(false)
+    }).catch(() => setLoading(false))
   }, [])
 
   const handlePredictionSaved = useCallback(
@@ -72,13 +73,13 @@ export default function MatchesPage() {
     []
   )
 
-  const filtered = matches.filter((m) => m.round.id === filter)
+  const filtered = filter !== null ? matches.filter((m) => m.round.id === filter) : []
 
   const predictionCount = matches.filter((m) => m.prediction).length
   const scoredCount = matches.filter((m) => m.prediction?.points_earned != null).length
   const totalPoints = matches.reduce((s, m) => s + (m.prediction?.points_earned ?? 0), 0)
 
-  if (loading) {
+  if (loading || filter === null) {
     return (
       <div style={{ textAlign: 'center', paddingTop: '80px', color: 'rgba(255,255,255,0.30)' }}>
         Loading matches…
