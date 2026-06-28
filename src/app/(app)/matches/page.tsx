@@ -37,14 +37,14 @@ export default function MatchesPage() {
   const [filter, setFilter] = useState<Filter | null>(null)
 
   useEffect(() => {
-    Promise.all([
-      fetch('/api/matches').then((r) => r.json()),
-      fetch('/api/settings').then((r) => r.json()).catch(() => ({ defaultRoundId: 8 })),
-    ]).then(([matchData, settings]) => {
-      setMatches(matchData)
-      setFilter((settings.defaultRoundId ?? 8) as Filter)
-      setLoading(false)
-    }).catch(() => setLoading(false))
+    fetch('/api/matches')
+      .then((r) => r.json())
+      .then(({ matches, defaultRoundId }) => {
+        setMatches(matches)
+        setFilter((defaultRoundId ?? 8) as Filter)
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
   }, [])
 
   const handlePredictionSaved = useCallback(

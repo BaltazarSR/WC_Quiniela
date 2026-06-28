@@ -74,16 +74,15 @@ export default function AdminPage() {
       fetch('/api/matches').then((r) => r.json()),
       fetch('/api/teams').then((r) => r.json()),
       fetch('/api/champion-prediction').then((r) => r.json()).catch(() => null),
-      fetch('/api/settings').then((r) => r.json()).catch(() => ({ defaultRoundId: 8 })),
-    ]).then(([matchData, teamData, champData, settingsData]: [MatchWithPrediction[], Team[], { champion_team_id: number | null } | null, { defaultRoundId: number }]) => {
+    ]).then(([{ matches: matchData, defaultRoundId: dr }, teamData, champData]: [{ matches: MatchWithPrediction[]; defaultRoundId: number }, Team[], { champion_team_id: number | null } | null]) => {
       setMatches(matchData)
       setTeams(teamData)
       if (champData?.champion_team_id != null) {
         setChampTeamId(champData.champion_team_id)
         setChampSelectId(champData.champion_team_id)
       }
-      setDefaultRoundId(settingsData.defaultRoundId ?? 8)
-      setDefaultRoundSelectId(settingsData.defaultRoundId ?? 8)
+      setDefaultRoundId(dr ?? 8)
+      setDefaultRoundSelectId(dr ?? 8)
 
       const scores: Record<number, ScoreState> = {}
       const tms: Record<number, TeamState> = {}

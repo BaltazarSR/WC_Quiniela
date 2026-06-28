@@ -3,23 +3,26 @@ import { withAuth } from '@/lib/with-auth'
 import { supabase } from '@/lib/supabase'
 
 export const GET = withAuth(async (_req, { session }) => {
-  const { data: allMatches, error: matchError } = await supabase
-    .from('matches')
-    .select(`
-      id, kickoff_utc, home_score, away_score, is_final, is_unlocked,
-      home_team:home_team_id(id, name, img_code, comment),
-      away_team:away_team_id(id, name, img_code, comment),
-      round:round_id(id, name),
-      group:group_id(id, name, short_name)
-    `)
-    .order('kickoff_utc', { ascending: true })
+  const [{ data: allMatches, error: matchError }, { data: settings }] = await Promise.all([
+    supabase
+      .from('matches')
+      .select(`
+        id, kickoff_utc, home_score, away_score, is_final, is_unlocked,
+        home_team:home_team_id(id, name, img_code, comment),
+        away_team:away_team_id(id, name, img_code, comment),
+        round:round_id(id, name),
+        group:group_id(id, name, short_name)
+      `)
+      .order('kickoff_utc', { ascending: true }),
+    supabase.from('tournament_settings').select('default_round_id').eq('id', 1).maybeSingle(),
+  ])
 
   if (matchError) {
     return NextResponse.json({ error: 'Failed to fetch matches.' }, { status: 500 })
   }
 
   const matches = allMatches ?? []
-  if (matches.length === 0) return NextResponse.json([])
+  if (matches.length === 0) return NextResponse.json({ picks: [], defaultRoundId: settings?.default_round_id ?? 8 })
 
   const lockCutoff = Date.now() + 5 * 60 * 1000
   const lockedIds = new Set(
@@ -95,5 +98,5 @@ export const GET = withAuth(async (_req, { session }) => {
     picks: picksMap.get(m.id) ?? [],
   }))
 
-  return NextResponse.json(result)
+  return NextResponse.json({ picks: result, defaultRoundId: settings?.default_round_id ?? 8 })
 })
