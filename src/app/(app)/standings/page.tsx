@@ -555,7 +555,7 @@ function BracketSection({ matches }: { matches: BracketMatch[] }) {
 // ── Page ───────────────────────────────────────────────────────────────────────
 
 export default function StandingsPage() {
-  const [tab, setTab] = useState<'groups' | 'bracket'>('bracket')
+  const [tab, setTab] = useState<'groups' | 'bracket'>('groups')
   const [groups, setGroups] = useState<GroupStanding[]>([])
   const [bracketMatches, setBracketMatches] = useState<BracketMatch[]>([])
   const [loadingGroups, setLoadingGroups] = useState(true)
