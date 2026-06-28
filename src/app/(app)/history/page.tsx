@@ -327,14 +327,14 @@ export default function HistoryPage() {
   const [filter, setFilter] = useState<Filter | null>(null)
 
   useEffect(() => {
-    fetch('/api/picks')
-      .then((r) => r.json())
-      .then(({ picks, defaultRoundId }: { picks: MatchWithPicks[]; defaultRoundId: number }) => {
-        setMatches(picks)
-        setFilter((defaultRoundId ?? 8) as Filter)
-        setLoading(false)
-      })
-      .catch(() => setLoading(false))
+    Promise.all([
+      fetch('/api/picks').then((r) => r.json()),
+      fetch('/api/settings').then((r) => r.json()).catch(() => ({ defaultRoundId: 8 })),
+    ]).then(([picksData, settings]: [MatchWithPicks[], { defaultRoundId: number }]) => {
+      setMatches(picksData)
+      setFilter((settings.defaultRoundId ?? 8) as Filter)
+      setLoading(false)
+    }).catch(() => setLoading(false))
   }, [])
 
   if (loading || filter === null) {
