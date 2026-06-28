@@ -6,7 +6,7 @@ export const GET = withAuth(async (_req, { session }) => {
   const { data: matches, error } = await supabase
     .from('matches')
     .select(`
-      id, kickoff_utc, home_score, away_score, is_final, is_unlocked,
+      id, kickoff_utc, home_score, away_score, advancing_team_id, is_final, is_unlocked,
       home_team:home_team_id(id, name, img_code, comment),
       away_team:away_team_id(id, name, img_code, comment),
       round:round_id(id, name),

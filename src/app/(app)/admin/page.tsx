@@ -12,6 +12,7 @@ interface ScoreState {
   homeScore: string
   awayScore: string
   isFinal: boolean
+  advancingTeamId: number | ''
   saving: boolean
   saved: boolean
   error: string
@@ -57,7 +58,7 @@ export default function AdminPage() {
   const [scoreStates, setScoreStates] = useState<Record<number, ScoreState>>({})
   const [teamStates, setTeamStates] = useState<Record<number, TeamState>>({})
   const [roundFilter, setRoundFilter] = useState<number>(8)
-  const [teamRoundFilter, setTeamRoundFilter] = useState<number>(0)
+  const [teamRoundFilter, setTeamRoundFilter] = useState<number>(2)
   const [champTeamId, setChampTeamId] = useState<number | null>(null)
   const [champSelectId, setChampSelectId] = useState<number | ''>('')
   const [champSaving, setChampSaving] = useState(false)
@@ -85,6 +86,7 @@ export default function AdminPage() {
           homeScore: m.home_score?.toString() ?? '',
           awayScore: m.away_score?.toString() ?? '',
           isFinal: m.is_final,
+          advancingTeamId: m.advancing_team_id ?? '',
           saving: false,
           saved: false,
           error: '',
@@ -120,6 +122,7 @@ export default function AdminPage() {
 
     updateScore(match.id, { saving: true, error: '' })
 
+    const isTie = Number(s.homeScore) === Number(s.awayScore)
     const res = await fetch(`/api/admin/matches/${match.id}/score`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -127,6 +130,7 @@ export default function AdminPage() {
         homeScore: Number(s.homeScore),
         awayScore: Number(s.awayScore),
         isFinal: s.isFinal,
+        advancingTeamId: isTie && s.advancingTeamId !== '' ? Number(s.advancingTeamId) : null,
       }),
     })
 
@@ -375,6 +379,51 @@ export default function AdminPage() {
                     </span>
                   </div>
                 </div>
+
+                {/* Who advances? — elimination rounds with tie score */}
+                {KNOCKOUT_ROUNDS.includes(match.round.id) && s.homeScore !== '' && s.awayScore !== '' && Number(s.homeScore) === Number(s.awayScore) && (
+                  <div style={{ marginBottom: '14px' }}>
+                    <div style={{ fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.13em', color: 'rgba(255,255,255,0.35)', marginBottom: '8px' }}>
+                      Who advances?
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      {[match.home_team, match.away_team].map((team) => {
+                        const flag = getFlagUrl(team.img_code)
+                        const code = getCountryCode(team.img_code)
+                        const selected = s.advancingTeamId === team.id
+                        return (
+                          <button
+                            key={team.id}
+                            onClick={() => updateScore(match.id, { advancingTeamId: team.id })}
+                            style={{
+                              flex: 1,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '6px',
+                              padding: '8px 10px',
+                              borderRadius: '8px',
+                              border: '1px solid',
+                              borderColor: selected ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.10)',
+                              background: selected ? 'rgba(255,255,255,0.08)' : 'transparent',
+                              color: selected ? '#fff' : 'rgba(255,255,255,0.45)',
+                              fontSize: '12px',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              transition: 'all 150ms',
+                            }}
+                          >
+                            {flag && (
+                              <img src={flag} alt={team.name} style={{ width: '18px', height: 'auto', borderRadius: '2px', flexShrink: 0 }} />
+                            )}
+                            <span className="hidden sm:inline">{team.name}</span>
+                            <span className="sm:hidden">{code ?? shortenTeamName(team.name)}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
 
                 {/* Footer */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

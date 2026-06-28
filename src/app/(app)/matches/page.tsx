@@ -47,20 +47,21 @@ export default function MatchesPage() {
   }, [])
 
   const handlePredictionSaved = useCallback(
-    (matchId: number, homeGoals: number, awayGoals: number) => {
+    (matchId: number, homeGoals: number, awayGoals: number, advancingTeamId: number | null) => {
       setMatches((prev) =>
         prev.map((m) =>
           m.id === matchId
             ? {
                 ...m,
                 prediction: m.prediction
-                  ? { ...m.prediction, home_goals: homeGoals, away_goals: awayGoals }
+                  ? { ...m.prediction, home_goals: homeGoals, away_goals: awayGoals, advancing_team_id: advancingTeamId }
                   : {
                       id: '',
                       user_id: '',
                       match_id: matchId,
                       home_goals: homeGoals,
                       away_goals: awayGoals,
+                      advancing_team_id: advancingTeamId,
                       points_earned: null,
                       submitted_at: new Date().toISOString(),
                     },

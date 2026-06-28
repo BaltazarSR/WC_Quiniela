@@ -6,7 +6,7 @@ export const GET = withAuth(async (_req, { session }) => {
   const { data: allMatches, error: matchError } = await supabase
     .from('matches')
     .select(`
-      id, kickoff_utc, home_score, away_score, is_final, is_unlocked,
+      id, kickoff_utc, home_score, away_score, advancing_team_id, is_final, is_unlocked,
       home_team:home_team_id(id, name, img_code, comment),
       away_team:away_team_id(id, name, img_code, comment),
       round:round_id(id, name),
@@ -34,11 +34,11 @@ export const GET = withAuth(async (_req, { session }) => {
   const [{ data: allPicks }, { data: myPicks }] = await Promise.all([
     supabase
       .from('predictions')
-      .select('match_id, user_id, home_goals, away_goals, points_earned, users(username)')
+      .select('match_id, user_id, home_goals, away_goals, advancing_team_id, points_earned, users(username)')
       .in('match_id', [...lockedIds]),
     supabase
       .from('predictions')
-      .select('match_id, user_id, home_goals, away_goals, points_earned, users(username)')
+      .select('match_id, user_id, home_goals, away_goals, advancing_team_id, points_earned, users(username)')
       .eq('user_id', session.userId)
       .in('match_id', matchIds),
   ])
@@ -49,6 +49,7 @@ export const GET = withAuth(async (_req, { session }) => {
       username: string
       home_goals: number
       away_goals: number
+      advancing_team_id: number | null
       points_earned: number | null
       is_me: boolean
     }>
@@ -63,6 +64,7 @@ export const GET = withAuth(async (_req, { session }) => {
       username: usersField?.username ?? 'Unknown',
       home_goals: p.home_goals,
       away_goals: p.away_goals,
+      advancing_team_id: p.advancing_team_id ?? null,
       points_earned: p.points_earned,
       is_me: p.user_id === session.userId,
     })
@@ -76,6 +78,7 @@ export const GET = withAuth(async (_req, { session }) => {
       username: usersField?.username ?? 'Unknown',
       home_goals: p.home_goals,
       away_goals: p.away_goals,
+      advancing_team_id: p.advancing_team_id ?? null,
       points_earned: p.points_earned,
       is_me: true,
     })

@@ -21,16 +21,29 @@ function PickRow({
   username,
   home_goals,
   away_goals,
+  advancing_team_id,
   points_earned,
   is_me,
+  home_team,
+  away_team,
 }: {
   username: string
   home_goals: number
   away_goals: number
+  advancing_team_id: number | null
   points_earned: number | null
   is_me: boolean
+  home_team: { id: number; name: string; img_code: string | null }
+  away_team: { id: number; name: string; img_code: string | null }
 }) {
   const pts = points_earned
+
+  const advancingTeam =
+    home_goals === away_goals && advancing_team_id != null
+      ? advancing_team_id === home_team.id
+        ? home_team
+        : away_team
+      : null
 
   return (
     <div
@@ -65,6 +78,9 @@ function PickRow({
 
       <span
         style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '4px',
           fontSize: '14px',
           fontWeight: 700,
           color: is_me ? '#fff' : 'rgba(255,255,255,0.55)',
@@ -75,6 +91,12 @@ function PickRow({
         }}
       >
         {home_goals} – {away_goals}
+        {advancingTeam && getFlagUrl(advancingTeam.img_code) && (
+          <>
+            <span style={{ fontFamily: 'inherit', color: 'rgba(255,255,255,0.25)', fontSize: '11px', marginLeft: '2px' }}>·</span>
+            <img src={getFlagUrl(advancingTeam.img_code)!} alt={advancingTeam.name} style={{ width: '16px', height: 'auto', borderRadius: '2px' }} />
+          </>
+        )}
       </span>
 
       <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.08)', flexShrink: 0 }} />
@@ -299,7 +321,12 @@ function MatchPickCard({ match }: { match: MatchWithPicks }) {
                 </div>
               </div>
               {match.picks.map((pick) => (
-                <PickRow key={pick.username} {...pick} />
+                <PickRow
+                  key={pick.username}
+                  {...pick}
+                  home_team={match.home_team}
+                  away_team={match.away_team}
+                />
               ))}
               {!match.is_locked && (
                 <p

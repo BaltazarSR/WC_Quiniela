@@ -33,6 +33,7 @@ export interface Match {
   group: Group | null
   home_score: number | null
   away_score: number | null
+  advancing_team_id: number | null
   is_final: boolean
   is_unlocked: boolean
 }
@@ -43,6 +44,7 @@ export interface Prediction {
   match_id: number
   home_goals: number
   away_goals: number
+  advancing_team_id: number | null
   points_earned: number | null
   submitted_at: string
 }
@@ -78,6 +80,7 @@ export interface MatchPick {
   username: string
   home_goals: number
   away_goals: number
+  advancing_team_id: number | null
   points_earned: number | null
   is_me: boolean
 }
@@ -89,6 +92,8 @@ export interface MatchWithPicks extends Match {
 
 // Round IDs in display order
 export const ROUND_ORDER = [1, 8, 2, 3, 4, 5, 6] as const
+
+export const ELIMINATION_ROUND_IDS = [8, 2, 3, 4, 5, 6] as const
 
 export const ROUND_LABELS: Record<number, string> = {
   1: 'Group Stage',

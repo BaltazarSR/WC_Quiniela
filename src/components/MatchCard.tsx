@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { CountdownTimer } from './CountdownTimer'
 import { SoccerIcon, PinIcon, LockIcon } from './icons'
 import type { MatchWithPrediction } from '@/lib/types'
+import { ELIMINATION_ROUND_IDS } from '@/lib/types'
 import { isPredictionLocked } from '@/lib/scoring'
 import { getFlagUrl, getCountryCode, shortenTeamName } from '@/lib/flags'
 
@@ -20,7 +21,7 @@ function formatKickoff(utc: string): string {
 
 interface Props {
   match: MatchWithPrediction
-  onPredictionSaved: (matchId: number, homeGoals: number, awayGoals: number) => void
+  onPredictionSaved: (matchId: number, homeGoals: number, awayGoals: number, advancingTeamId: number | null) => void
 }
 
 export function MatchCard({ match, onPredictionSaved }: Props) {
@@ -30,6 +31,7 @@ export function MatchCard({ match, onPredictionSaved }: Props) {
 
   const [homeGoals, setHomeGoals] = useState(match.prediction?.home_goals ?? '')
   const [awayGoals, setAwayGoals] = useState(match.prediction?.away_goals ?? '')
+  const [advancingTeamId, setAdvancingTeamId] = useState<number | ''>(match.prediction?.advancing_team_id ?? '')
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
   const [saved, setSaved] = useState(false)
@@ -53,8 +55,17 @@ export function MatchCard({ match, onPredictionSaved }: Props) {
     return () => clearInterval(id)
   }, [match.kickoff_utc, match.is_unlocked, adminLocked])
 
+  const hasFinalScore = match.is_final && match.home_score != null && match.away_score != null
+  const hasPrediction = match.prediction != null
+  const pointsEarned = match.prediction?.points_earned
+
+  const isElim = (ELIMINATION_ROUND_IDS as readonly number[]).includes(match.round.id)
+  const predIsTie = homeGoals !== '' && awayGoals !== '' && Number(homeGoals) === Number(awayGoals)
+  const showAdvancing = isElim && !locked && !hasFinalScore && predIsTie
+
   async function handleSave() {
     if (homeGoals === '' || awayGoals === '') return
+    if (isElim && predIsTie && advancingTeamId === '') return
     setSaveError('')
     setSaving(true)
 
@@ -65,6 +76,7 @@ export function MatchCard({ match, onPredictionSaved }: Props) {
         matchId: match.id,
         homeGoals: Number(homeGoals),
         awayGoals: Number(awayGoals),
+        advancingTeamId: isElim && predIsTie ? Number(advancingTeamId) : null,
       }),
     })
 
@@ -78,12 +90,13 @@ export function MatchCard({ match, onPredictionSaved }: Props) {
 
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
-    onPredictionSaved(match.id, Number(homeGoals), Number(awayGoals))
+    onPredictionSaved(
+      match.id,
+      Number(homeGoals),
+      Number(awayGoals),
+      isElim && predIsTie ? Number(advancingTeamId) : null
+    )
   }
-
-  const hasFinalScore = match.is_final && match.home_score != null && match.away_score != null
-  const hasPrediction = match.prediction != null
-  const pointsEarned = match.prediction?.points_earned
 
   const inputStyle: React.CSSProperties = {
     width: '52px',
@@ -105,6 +118,22 @@ export function MatchCard({ match, onPredictionSaved }: Props) {
   const awayFlag = getFlagUrl(match.away_team.img_code)
   const homeCode = getCountryCode(match.home_team.img_code)
   const awayCode = getCountryCode(match.away_team.img_code)
+
+  // Advancing team for the final result display
+  const actualAdvancingTeam =
+    hasFinalScore && match.home_score === match.away_score && match.advancing_team_id != null
+      ? match.advancing_team_id === match.home_team.id
+        ? match.home_team
+        : match.away_team
+      : null
+
+  // User's predicted advancing team (for locked-but-not-final display)
+  const predAdvancingTeam =
+    isElim && locked && !hasFinalScore && match.prediction?.advancing_team_id != null
+      ? match.prediction.advancing_team_id === match.home_team.id
+        ? match.home_team
+        : match.away_team
+      : null
 
   return (
     <div
@@ -280,8 +309,10 @@ export function MatchCard({ match, onPredictionSaved }: Props) {
             value={homeGoals}
             disabled={locked || hasFinalScore}
             onChange={(e) => {
-              setHomeGoals(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))
+              const v = e.target.value === '' ? '' : Math.max(0, Number(e.target.value))
+              setHomeGoals(v)
               setSaved(false)
+              if (v !== awayGoals) setAdvancingTeamId('')
             }}
             style={inputStyle}
             onFocus={(e) => !locked && !hasFinalScore && (e.target.style.borderColor = 'rgba(255,255,255,0.30)')}
@@ -295,8 +326,10 @@ export function MatchCard({ match, onPredictionSaved }: Props) {
             value={awayGoals}
             disabled={locked || hasFinalScore}
             onChange={(e) => {
-              setAwayGoals(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))
+              const v = e.target.value === '' ? '' : Math.max(0, Number(e.target.value))
+              setAwayGoals(v)
               setSaved(false)
+              if (homeGoals !== v) setAdvancingTeamId('')
             }}
             style={inputStyle}
             onFocus={(e) => !locked && !hasFinalScore && (e.target.style.borderColor = 'rgba(255,255,255,0.30)')}
@@ -338,7 +371,92 @@ export function MatchCard({ match, onPredictionSaved }: Props) {
         </div>
       </div>
 
-      {/* Sub-result row: show actual score when match is final */}
+      {/* Who advances? — shown when predicting a tie in an elimination round */}
+      {showAdvancing && (
+        <div
+          style={{
+            marginTop: '12px',
+            paddingTop: '12px',
+            borderTop: '1px solid rgba(255,255,255,0.05)',
+          }}
+        >
+          <div
+            style={{
+              fontSize: '10px',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.13em',
+              color: 'rgba(255,255,255,0.35)',
+              marginBottom: '8px',
+            }}
+          >
+            Who advances?
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            {[match.home_team, match.away_team].map((team) => {
+              const flag = getFlagUrl(team.img_code)
+              const code = getCountryCode(team.img_code)
+              const selected = advancingTeamId === team.id
+              return (
+                <button
+                  key={team.id}
+                  onClick={() => { setAdvancingTeamId(team.id); setSaved(false) }}
+                  style={{
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    padding: '8px 10px',
+                    borderRadius: '8px',
+                    border: '1px solid',
+                    borderColor: selected ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.10)',
+                    background: selected ? 'rgba(255,255,255,0.08)' : 'transparent',
+                    color: selected ? '#fff' : 'rgba(255,255,255,0.45)',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 150ms',
+                  }}
+                >
+                  {flag && (
+                    <img src={flag} alt={team.name} style={{ width: '18px', height: 'auto', borderRadius: '2px', flexShrink: 0 }} />
+                  )}
+                  <span className="hidden sm:inline">{team.name}</span>
+                  <span className="sm:hidden">{code ?? shortenTeamName(team.name)}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Locked advancing team pick (locked but not yet final) */}
+      {predAdvancingTeam && (
+        <div
+          style={{
+            marginTop: '10px',
+            paddingTop: '10px',
+            borderTop: '1px solid rgba(255,255,255,0.05)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontSize: '11px',
+            color: 'rgba(255,255,255,0.40)',
+          }}
+        >
+          <span style={{ textTransform: 'uppercase', letterSpacing: '0.10em', fontSize: '10px' }}>Advances:</span>
+          {getFlagUrl(predAdvancingTeam.img_code) && (
+            <img src={getFlagUrl(predAdvancingTeam.img_code)!} alt={predAdvancingTeam.name} style={{ width: '16px', height: 'auto', borderRadius: '2px' }} />
+          )}
+          <span style={{ color: 'rgba(255,255,255,0.60)', fontWeight: 600 }}>
+            <span className="hidden sm:inline">{predAdvancingTeam.name}</span>
+            <span className="sm:hidden">{getCountryCode(predAdvancingTeam.img_code) ?? shortenTeamName(predAdvancingTeam.name)}</span>
+          </span>
+        </div>
+      )}
+
+      {/* Sub-result row: show actual score (and advancing team) when match is final */}
       {hasFinalScore && (
         <div
           style={{
@@ -354,6 +472,19 @@ export function MatchCard({ match, onPredictionSaved }: Props) {
           <span style={{ color: 'rgba(255,255,255,0.70)', fontFamily: 'ui-monospace, monospace' }}>
             {match.home_score} – {match.away_score}
           </span>
+          {actualAdvancingTeam && (
+            <span style={{ marginLeft: '8px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+              ·
+              {getFlagUrl(actualAdvancingTeam.img_code) && (
+                <img src={getFlagUrl(actualAdvancingTeam.img_code)!} alt={actualAdvancingTeam.name} style={{ width: '14px', height: 'auto', borderRadius: '2px', marginLeft: '6px' }} />
+              )}
+              <span style={{ color: 'rgba(255,255,255,0.55)' }}>
+                <span className="hidden sm:inline">{actualAdvancingTeam.name}</span>
+                <span className="sm:hidden">{getCountryCode(actualAdvancingTeam.img_code) ?? shortenTeamName(actualAdvancingTeam.name)}</span>
+                {' '}advances
+              </span>
+            </span>
+          )}
         </div>
       )}
 
@@ -387,7 +518,7 @@ export function MatchCard({ match, onPredictionSaved }: Props) {
         {!hasFinalScore && !locked && (
           <button
             onClick={handleSave}
-            disabled={saving || homeGoals === '' || awayGoals === ''}
+            disabled={saving || homeGoals === '' || awayGoals === '' || (isElim && predIsTie && advancingTeamId === '')}
             style={{
               flexShrink: 0,
               height: '32px',
@@ -402,8 +533,8 @@ export function MatchCard({ match, onPredictionSaved }: Props) {
               fontWeight: 600,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
-              cursor: saving || homeGoals === '' || awayGoals === '' ? 'not-allowed' : 'pointer',
-              opacity: saving || homeGoals === '' || awayGoals === '' ? 0.5 : 1,
+              cursor: saving || homeGoals === '' || awayGoals === '' || (isElim && predIsTie && advancingTeamId === '') ? 'not-allowed' : 'pointer',
+              opacity: saving || homeGoals === '' || awayGoals === '' || (isElim && predIsTie && advancingTeamId === '') ? 0.5 : 1,
               transition: 'all 150ms',
             }}
           >

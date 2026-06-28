@@ -7,7 +7,7 @@ export const POST = withAdmin(async (req: NextRequest, { params }) => {
   const id = params?.id ? parseInt(params.id, 10) : null
   if (!id || isNaN(id)) return NextResponse.json({ error: 'Missing match id.' }, { status: 400 })
 
-  const { homeScore, awayScore, isFinal, homeTeamId, awayTeamId } = await req.json()
+  const { homeScore, awayScore, isFinal, homeTeamId, awayTeamId, advancingTeamId } = await req.json()
 
   if (homeScore == null || awayScore == null) {
     return NextResponse.json({ error: 'Scores are required.' }, { status: 400 })
@@ -17,6 +17,7 @@ export const POST = withAdmin(async (req: NextRequest, { params }) => {
     home_score: homeScore,
     away_score: awayScore,
     is_final: isFinal ?? false,
+    advancing_team_id: homeScore === awayScore ? (advancingTeamId ?? null) : null,
   }
 
   if (homeTeamId != null) updatePayload.home_team_id = homeTeamId
@@ -32,9 +33,11 @@ export const POST = withAdmin(async (req: NextRequest, { params }) => {
   }
 
   if (isFinal) {
+    const actualAdvancingTeamId = homeScore === awayScore ? (advancingTeamId ?? null) : null
+
     const { data: predictions } = await supabase
       .from('predictions')
-      .select('id, home_goals, away_goals')
+      .select('id, home_goals, away_goals, advancing_team_id')
       .eq('match_id', id)
 
     if (predictions?.length) {
@@ -42,7 +45,16 @@ export const POST = withAdmin(async (req: NextRequest, { params }) => {
         predictions.map((p) =>
           supabase
             .from('predictions')
-            .update({ points_earned: calculatePoints(p.home_goals, p.away_goals, homeScore, awayScore) })
+            .update({
+              points_earned: calculatePoints(
+                p.home_goals,
+                p.away_goals,
+                homeScore,
+                awayScore,
+                p.advancing_team_id,
+                actualAdvancingTeamId
+              ),
+            })
             .eq('id', p.id)
         )
       )
