@@ -13,7 +13,7 @@ export function calculatePoints(
     const correctTeam = predAdvancingTeamId === actualAdvancingTeamId
     if (exactScore && correctTeam) return 3
     if (exactScore || correctTeam) return 1
-    return 0
+    return 1
   }
   if (predHome === actualHome && predAway === actualAway) return 3
   const predResult = Math.sign(predHome - predAway)
