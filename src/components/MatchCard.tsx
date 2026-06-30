@@ -478,11 +478,6 @@ export function MatchCard({ match, onPredictionSaved }: Props) {
               {getFlagUrl(actualAdvancingTeam.img_code) && (
                 <img src={getFlagUrl(actualAdvancingTeam.img_code)!} alt={actualAdvancingTeam.name} style={{ width: '14px', height: 'auto', borderRadius: '2px', marginLeft: '6px' }} />
               )}
-              <span style={{ color: 'rgba(255,255,255,0.55)' }}>
-                <span className="hidden sm:inline">{actualAdvancingTeam.name}</span>
-                <span className="sm:hidden">{getCountryCode(actualAdvancingTeam.img_code) ?? shortenTeamName(actualAdvancingTeam.name)}</span>
-                {' '}advances
-              </span>
             </span>
           )}
         </div>
