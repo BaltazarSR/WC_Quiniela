@@ -122,7 +122,7 @@ export function NavBar({
               flexShrink: 0,
             }}
           >
-            Thinkers Cup
+            ¿Y si sí?
           </Link>
 
           {/* Desktop nav — hidden on mobile */}
