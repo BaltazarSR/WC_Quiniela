@@ -135,6 +135,16 @@ export function MatchCard({ match, onPredictionSaved }: Props) {
         : match.away_team
       : null
 
+  const predTiedWithPick =
+    hasFinalScore && isElim &&
+    match.prediction?.advancing_team_id != null &&
+    match.prediction.home_goals != null &&
+    match.prediction.away_goals != null &&
+    match.prediction.home_goals === match.prediction.away_goals
+
+  const highlightHomeAdvancing = predTiedWithPick && match.prediction!.advancing_team_id === match.home_team.id
+  const highlightAwayAdvancing = predTiedWithPick && match.prediction!.advancing_team_id === match.away_team.id
+
   return (
     <div
       style={{
@@ -274,30 +284,42 @@ export function MatchCard({ match, onPredictionSaved }: Props) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-end',
-            gap: '8px',
             minWidth: 0,
           }}
         >
-          <span
+          <div
             style={{
-              fontSize: '14px',
-              fontWeight: 600,
-              color: '#fff',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '6px 10px',
+              borderRadius: '6px',
+              background: highlightHomeAdvancing ? 'rgba(255,255,255,0.06)' : 'transparent',
+              transition: 'background 150ms',
+              minWidth: 0,
             }}
           >
-            <span className="hidden sm:inline">{match.home_team.name}</span>
-            <span className="sm:hidden">{homeCode ?? shortenTeamName(match.home_team.name)}</span>
-          </span>
-          {homeFlag && (
-            <img
-              src={homeFlag}
-              alt={match.home_team.name}
-              style={{ width: '24px', height: 'auto', borderRadius: '2px', flexShrink: 0 }}
-            />
-          )}
+            <span
+              style={{
+                fontSize: '14px',
+                fontWeight: 600,
+                color: '#fff',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <span className="hidden sm:inline">{match.home_team.name}</span>
+              <span className="sm:hidden">{homeCode ?? shortenTeamName(match.home_team.name)}</span>
+            </span>
+            {homeFlag && (
+              <img
+                src={homeFlag}
+                alt={match.home_team.name}
+                style={{ width: '24px', height: 'auto', borderRadius: '2px', flexShrink: 0 }}
+              />
+            )}
+          </div>
         </div>
 
         {/* Score/input area */}
@@ -344,30 +366,42 @@ export function MatchCard({ match, onPredictionSaved }: Props) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-start',
-            gap: '8px',
             minWidth: 0,
           }}
         >
-          {awayFlag && (
-            <img
-              src={awayFlag}
-              alt={match.away_team.name}
-              style={{ width: '24px', height: 'auto', borderRadius: '2px', flexShrink: 0 }}
-            />
-          )}
-          <span
+          <div
             style={{
-              fontSize: '14px',
-              fontWeight: 600,
-              color: '#fff',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '6px 10px',
+              borderRadius: '6px',
+              background: highlightAwayAdvancing ? 'rgba(255,255,255,0.06)' : 'transparent',
+              transition: 'background 150ms',
+              minWidth: 0,
             }}
           >
-            <span className="hidden sm:inline">{match.away_team.name}</span>
-            <span className="sm:hidden">{awayCode ?? shortenTeamName(match.away_team.name)}</span>
-          </span>
+            {awayFlag && (
+              <img
+                src={awayFlag}
+                alt={match.away_team.name}
+                style={{ width: '24px', height: 'auto', borderRadius: '2px', flexShrink: 0 }}
+              />
+            )}
+            <span
+              style={{
+                fontSize: '14px',
+                fontWeight: 600,
+                color: '#fff',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <span className="hidden sm:inline">{match.away_team.name}</span>
+              <span className="sm:hidden">{awayCode ?? shortenTeamName(match.away_team.name)}</span>
+            </span>
+          </div>
         </div>
       </div>
 
@@ -411,7 +445,7 @@ export function MatchCard({ match, onPredictionSaved }: Props) {
                     borderRadius: '8px',
                     border: '1px solid',
                     borderColor: selected ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.10)',
-                    background: selected ? 'rgba(255,255,255,0.08)' : 'transparent',
+                    background: selected ? 'rgba(255,255,255,0.06)' : 'transparent',
                     color: selected ? '#fff' : 'rgba(255,255,255,0.45)',
                     fontSize: '12px',
                     fontWeight: 600,

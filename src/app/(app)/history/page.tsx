@@ -222,9 +222,23 @@ function MatchPickCard({ match }: { match: MatchWithPicks }) {
                   fontWeight: 700,
                   fontFamily: 'ui-monospace, monospace',
                   color: 'rgba(255,255,255,0.70)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '5px',
                 }}
               >
                 {match.home_score} – {match.away_score}
+                {match.advancing_team_id != null && (() => {
+                  const team = match.advancing_team_id === match.home_team.id ? match.home_team : match.away_team
+                  const flag = getFlagUrl(team.img_code)
+                  return flag ? (
+                    <>
+                      <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '11px' }}>·</span>
+                      <img src={flag} alt={team.name} style={{ width: '16px', height: 'auto', borderRadius: '2px', flexShrink: 0 }} />
+                    </>
+                  ) : null
+                })()}
               </div>
             </div>
           ) : (
