@@ -365,7 +365,7 @@ function MatchPickCard({ match }: { match: MatchWithPicks }) {
 export default function HistoryPage() {
   const [matches, setMatches] = useState<MatchWithPicks[]>([])
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState<Filter>(2)
+  const [filter, setFilter] = useState<Filter>(3)
 
   useEffect(() => {
     fetch('/api/picks')
