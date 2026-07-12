@@ -34,7 +34,7 @@ function groupMatchesByDate(matches: MatchWithPrediction[]) {
 export default function MatchesPage() {
   const [matches, setMatches] = useState<MatchWithPrediction[]>([])
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState<Filter>(3)
+  const [filter, setFilter] = useState<Filter>(4)
 
   useEffect(() => {
     fetch('/api/matches')
