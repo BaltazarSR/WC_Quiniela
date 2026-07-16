@@ -12,6 +12,7 @@ create table if not exists users (
   username text unique not null,
   password_hash text not null,
   is_admin boolean default false,
+  is_nuked boolean default false,
   pool_id uuid references pools(id),
   created_at timestamptz default now()
 );

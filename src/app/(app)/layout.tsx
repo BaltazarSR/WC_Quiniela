@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { sessionOptions, SessionData } from '@/lib/session-options'
 import { NavBar } from '@/components/NavBar'
+import { NukeBanner } from '@/components/NukeBanner'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await getIronSession<SessionData>(await cookies(), sessionOptions)
@@ -14,6 +15,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div style={{ minHeight: '100vh', background: '#000' }}>
       <NavBar username={session.username} isAdmin={session.isAdmin} />
+      <NukeBanner />
       <main
         className="pb-20 md:pb-6"
         style={{

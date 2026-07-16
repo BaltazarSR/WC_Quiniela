@@ -8,7 +8,7 @@ export const GET = withAuth(async () => {
     { data: settings },
     { data: champPreds },
   ] = await Promise.all([
-    supabase.from('predictions').select('user_id, points_earned, users(username)'),
+    supabase.from('predictions').select('user_id, points_earned, users(username, is_nuked)'),
     supabase
       .from('tournament_settings')
       .select('champion_team_id')
@@ -16,7 +16,7 @@ export const GET = withAuth(async () => {
       .maybeSingle(),
     supabase
       .from('champion_predictions')
-      .select('user_id, team_id, team:team_id(name, img_code), users(username)'),
+      .select('user_id, team_id, team:team_id(name, img_code), users(username, is_nuked)'),
   ])
 
   if (error) {
@@ -34,11 +34,12 @@ export const GET = withAuth(async () => {
       champion_team: string | null
       champion_team_img_code: string | null
       champion_correct: boolean | null
+      is_nuked: boolean
     }
   >()
 
   for (const p of predictions ?? []) {
-    const usersField = p.users as unknown as { username: string } | null
+    const usersField = p.users as unknown as { username: string; is_nuked: boolean } | null
     const username = usersField?.username ?? 'Unknown'
     if (!totals.has(p.user_id)) {
       totals.set(p.user_id, {
@@ -50,6 +51,7 @@ export const GET = withAuth(async () => {
         champion_team: null,
         champion_team_img_code: null,
         champion_correct: null,
+        is_nuked: usersField?.is_nuked ?? false,
       })
     }
     const entry = totals.get(p.user_id)!
@@ -64,7 +66,7 @@ export const GET = withAuth(async () => {
   // Include users who have a champion pick but no match predictions yet
   for (const cp of champPreds ?? []) {
     if (!totals.has(cp.user_id)) {
-      const usersField = cp.users as unknown as { username: string } | null
+      const usersField = cp.users as unknown as { username: string; is_nuked: boolean } | null
       totals.set(cp.user_id, {
         username: usersField?.username ?? 'Unknown',
         total_points: 0,
@@ -74,6 +76,7 @@ export const GET = withAuth(async () => {
         champion_team: null,
         champion_team_img_code: null,
         champion_correct: null,
+        is_nuked: usersField?.is_nuked ?? false,
       })
     }
   }

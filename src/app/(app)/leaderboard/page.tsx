@@ -145,6 +145,16 @@ export default function LeaderboardPage() {
 
   return (
     <div>
+      <style>{`
+        @keyframes nuke-glow {
+          0%, 100% { box-shadow: 0 0 8px rgba(239,68,68,0.10); }
+          50%       { box-shadow: 0 0 20px rgba(239,68,68,0.28); }
+        }
+        @keyframes nuke-badge-pulse {
+          0%, 100% { opacity: 1; }
+          50%       { opacity: 0.5; }
+        }
+      `}</style>
       <audio ref={audioRef} src="/cucaracha_song.mp3" loop />
 
       {mexicoMode && (
@@ -270,51 +280,79 @@ export default function LeaderboardPage() {
               justifyContent: 'space-between',
               padding: '12px 16px',
               borderRadius: '12px',
-              border: '1px solid rgba(255,255,255,0.07)',
-              background: rank === 1 ? 'rgba(251,191,36,0.04)' : 'rgba(255,255,255,0.02)',
+              border: entry.is_nuked
+                ? '1px solid rgba(239,68,68,0.35)'
+                : '1px solid rgba(255,255,255,0.07)',
+              background: entry.is_nuked
+                ? 'rgba(239,68,68,0.06)'
+                : rank === 1 ? 'rgba(251,191,36,0.04)' : 'rgba(255,255,255,0.02)',
               gap: '12px',
+              animation: entry.is_nuked ? 'nuke-glow 2s ease-in-out infinite' : 'none',
             }}
           >
             {/* Rank + username */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: 0, flex: 1 }}>
-              <span
-                style={{
-                  fontSize: '14px',
-                  fontWeight: 700,
-                  color: rank <= 3 ? medalColors[rank - 1] : 'rgba(255,255,255,0.30)',
-                  width: '24px',
-                  textAlign: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                {rank}
-              </span>
-              <span
-                style={{
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: '#fff',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {entry.username}
-              </span>
+              {entry.is_nuked ? (
+                <img src="/radiation.svg" alt="" style={{ width: '18px', height: '18px', flexShrink: 0, opacity: 0.8 }} />
+              ) : (
+                <span
+                  style={{
+                    fontSize: '14px',
+                    fontWeight: 700,
+                    color: rank <= 3 ? medalColors[rank - 1] : 'rgba(255,255,255,0.30)',
+                    width: '24px',
+                    textAlign: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  {rank}
+                </span>
+              )}
+
+              <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                <span
+                  style={{
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    color: entry.is_nuked ? 'rgba(239,68,68,0.60)' : '#fff',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    textDecoration: entry.is_nuked ? 'line-through' : 'none',
+                    textDecorationColor: 'rgba(239,68,68,0.50)',
+                  }}
+                >
+                  {entry.username}
+                </span>
+                {entry.is_nuked && (
+                  <span
+                    style={{
+                      fontSize: '8px',
+                      fontWeight: 800,
+                      letterSpacing: '0.16em',
+                      color: '#ef4444',
+                      textTransform: 'uppercase',
+                      animation: 'nuke-badge-pulse 1.6s ease-in-out infinite',
+                    }}
+                  >
+                    ☢ Nuked
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Stats */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0, opacity: entry.is_nuked ? 0.45 : 1, transition: 'opacity 300ms' }}>
               {/* Exact */}
               <div style={{ textAlign: 'center' }}>
                 <div style={labelStyle}>Exact</div>
-                <div style={{ fontSize: '14px', fontWeight: 700, color: '#4ade80' }}>{entry.exact_scores}</div>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: entry.is_nuked ? '#fca5a5' : '#4ade80' }}>{entry.exact_scores}</div>
               </div>
 
               {/* Correct */}
               <div style={{ textAlign: 'center' }}>
                 <div style={labelStyle}>Correct</div>
-                <div style={{ fontSize: '14px', fontWeight: 700, color: '#fbbf24' }}>{entry.correct_results}</div>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: entry.is_nuked ? '#fca5a5' : '#fbbf24' }}>{entry.correct_results}</div>
               </div>
 
               {/* Champion — mobile compact */}
@@ -340,7 +378,7 @@ export default function LeaderboardPage() {
               {/* Points */}
               <div style={{ minWidth: '52px', textAlign: 'right' }}>
                 <div style={labelStyle}>Points</div>
-                <div style={{ fontSize: '20px', fontWeight: 700, color: '#fff', lineHeight: 1 }}>
+                <div style={{ fontSize: '20px', fontWeight: 700, color: entry.is_nuked ? '#fca5a5' : '#fff', lineHeight: 1 }}>
                   {entry.total_points}
                 </div>
               </div>

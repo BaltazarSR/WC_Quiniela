@@ -16,14 +16,25 @@ export const POST = withAuth(async (req: NextRequest, { session }) => {
     return NextResponse.json({ error: 'Goals must be non-negative integers.' }, { status: 400 })
   }
 
-  const { data: match } = await supabase
-    .from('matches')
-    .select('kickoff_utc, is_final, is_unlocked, round_id, home_team_id, away_team_id')
-    .eq('id', matchId)
-    .single()
+  const [{ data: match }, { data: user }] = await Promise.all([
+    supabase
+      .from('matches')
+      .select('kickoff_utc, is_final, is_unlocked, round_id, home_team_id, away_team_id')
+      .eq('id', matchId)
+      .single(),
+    supabase
+      .from('users')
+      .select('is_nuked')
+      .eq('id', session.userId)
+      .single(),
+  ])
 
   if (!match) {
     return NextResponse.json({ error: 'Match not found.' }, { status: 404 })
+  }
+
+  if (user?.is_nuked) {
+    return NextResponse.json({ error: 'You have been nuked. Resist first.' }, { status: 403 })
   }
 
   if (match.is_final || !match.is_unlocked || isPredictionLocked(match.kickoff_utc)) {

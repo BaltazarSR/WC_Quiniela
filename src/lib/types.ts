@@ -62,6 +62,7 @@ export interface LeaderboardEntry {
   champion_team: string | null
   champion_team_img_code: string | null
   champion_correct: boolean | null
+  is_nuked: boolean
 }
 
 export interface ChampionData {
