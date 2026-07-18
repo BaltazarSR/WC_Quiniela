@@ -13,6 +13,8 @@ create table if not exists users (
   password_hash text not null,
   is_admin boolean default false,
   is_nuked boolean default false,
+  riddle text,
+  riddle_answer text,
   pool_id uuid references pools(id),
   created_at timestamptz default now()
 );

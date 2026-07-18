@@ -50,6 +50,9 @@ export default function VillainPage() {
   const [screenFlash, setScreenFlash] = useState(false)
   const [shaking, setShaking] = useState(false)
   const [briefingOpen, setBriefingOpen] = useState(false)
+  const [riddleFormId, setRiddleFormId] = useState<string | null>(null)
+  const [riddleText, setRiddleText] = useState('')
+  const [riddleAnswerText, setRiddleAnswerText] = useState('')
 
   async function handleSubmitCode(e: React.FormEvent) {
     e.preventDefault()
@@ -80,10 +83,9 @@ export default function VillainPage() {
     fetchPlayers(token).finally(() => setLoading(false))
   }, [token])
 
-  async function handleNuke(userId: string) {
+  async function handleNuke(userId: string, riddle?: string, riddleAnswer?: string) {
     if (!token) return
 
-    // Fire animations immediately
     setGlitchingId(userId)
     setScreenFlash(true)
     setShaking(true)
@@ -92,13 +94,14 @@ export default function VillainPage() {
     setTimeout(() => setShaking(false), 600)
 
     setNuking(userId)
+    setRiddleFormId(null)
+    setRiddleText('')
+    setRiddleAnswerText('')
+
     await fetch('/api/villain/nuke', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ userId }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ userId, riddle, riddleAnswer }),
     })
     await fetchPlayers(token)
     setNuking(null)
@@ -322,11 +325,10 @@ export default function VillainPage() {
               }}
             >
               {[
-                'El jugador elegido ve un mensaje de burla en cada página de la app.',
-                'Sus predicciones quedan completamente bloqueadas hasta que resista.',
-                'Su lugar en el ranking aparece marcado para que todos lo vean.',
-                'Puede resistir por su cuenta y quitarse la nuke él solo.',
-                'Solo una nuke a la vez. Nukear a otro libera al objetivo actual.',
+                'Sus predicciones quedan bloqueadas mientras esté nukeado.',
+                'Para liberarse debe responder el acertijo que tú le dejas.',
+                'Tú decides el acertijo y la respuesta correcta.',
+                'Solo una nuke activa a la vez.',
               ].map((text) => (
                 <div key={text} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
                   <span style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(239,68,68,0.50)', flexShrink: 0, marginTop: '3px', letterSpacing: '0.05em' }}>—</span>
@@ -353,8 +355,8 @@ export default function VillainPage() {
               const isGlitching = glitchingId === player.id
 
               return (
+                <div key={player.id}>
                 <div
-                  key={player.id}
                   onMouseEnter={() => setHoveredId(player.id)}
                   onMouseLeave={() => setHoveredId(null)}
                   style={{
@@ -362,7 +364,7 @@ export default function VillainPage() {
                     alignItems: 'center',
                     gap: '14px',
                     padding: '14px 16px',
-                    borderRadius: '14px',
+                    borderRadius: riddleFormId === player.id ? '14px 14px 0 0' : '14px',
                     border: player.is_nuked
                       ? '1px solid rgba(239,68,68,0.40)'
                       : isHovered
@@ -484,9 +486,17 @@ export default function VillainPage() {
                     )}
                   </div>
 
-                  {/* Nuke button */}
+                  {/* Nuke / Deactivate button */}
                   <button
-                    onClick={() => handleNuke(player.id)}
+                    onClick={() => {
+                      if (player.is_nuked) {
+                        handleNuke(player.id)
+                      } else {
+                        setRiddleFormId(riddleFormId === player.id ? null : player.id)
+                        setRiddleText('')
+                        setRiddleAnswerText('')
+                      }
+                    }}
                     disabled={isNuking}
                     onMouseEnter={() => setHoveredNuke(player.id)}
                     onMouseLeave={() => setHoveredNuke(null)}
@@ -519,6 +529,99 @@ export default function VillainPage() {
                   >
                     {isNuking ? '…' : player.is_nuked ? 'Deactivate' : 'Nuke'}
                   </button>
+                </div>
+
+                {/* Inline riddle form */}
+                {riddleFormId === player.id && (
+                  <div
+                    style={{
+                      padding: '12px 16px',
+                      borderRadius: '0 0 14px 14px',
+                      border: '1px solid rgba(255,255,255,0.07)',
+                      borderTop: 'none',
+                      background: 'rgba(255,255,255,0.02)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px',
+                      marginTop: '-4px',
+                    }}
+                  >
+                    <p style={{ margin: 0, fontSize: '10px', color: 'rgba(255,255,255,0.30)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                      Set a riddle for {player.username}
+                    </p>
+                    <input
+                      type="text"
+                      value={riddleText}
+                      onChange={(e) => setRiddleText(e.target.value)}
+                      placeholder="Riddle..."
+                      style={{
+                        width: '100%',
+                        padding: '9px 12px',
+                        background: 'rgba(255,255,255,0.04)',
+                        border: '1px solid rgba(255,255,255,0.10)',
+                        borderRadius: '8px',
+                        color: '#fff',
+                        fontSize: '12px',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                    <input
+                      type="text"
+                      value={riddleAnswerText}
+                      onChange={(e) => setRiddleAnswerText(e.target.value)}
+                      placeholder="Answer..."
+                      style={{
+                        width: '100%',
+                        padding: '9px 12px',
+                        background: 'rgba(255,255,255,0.04)',
+                        border: '1px solid rgba(255,255,255,0.10)',
+                        borderRadius: '8px',
+                        color: '#fff',
+                        fontSize: '12px',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button
+                        onClick={() => handleNuke(player.id, riddleText.trim(), riddleAnswerText.trim())}
+                        disabled={!riddleText.trim() || !riddleAnswerText.trim()}
+                        style={{
+                          flex: 1,
+                          padding: '9px',
+                          borderRadius: '8px',
+                          border: '1px solid #991b1b',
+                          background: '#7f1d1d',
+                          color: '#fca5a5',
+                          fontSize: '10px',
+                          fontWeight: 700,
+                          letterSpacing: '0.12em',
+                          textTransform: 'uppercase',
+                          cursor: !riddleText.trim() || !riddleAnswerText.trim() ? 'not-allowed' : 'pointer',
+                          opacity: !riddleText.trim() || !riddleAnswerText.trim() ? 0.4 : 1,
+                        }}
+                      >
+                        Confirm Nuke
+                      </button>
+                      <button
+                        onClick={() => setRiddleFormId(null)}
+                        style={{
+                          padding: '9px 14px',
+                          borderRadius: '8px',
+                          border: '1px solid rgba(255,255,255,0.08)',
+                          background: 'transparent',
+                          color: 'rgba(255,255,255,0.30)',
+                          fontSize: '10px',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
                 </div>
               )
             })}

@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase'
 export const GET = withAuth(async (_req, { session }) => {
   const { data: user } = await supabase
     .from('users')
-    .select('is_nuked')
+    .select('is_nuked, riddle')
     .eq('id', session.userId)
     .single()
 
@@ -14,5 +14,6 @@ export const GET = withAuth(async (_req, { session }) => {
     username: session.username,
     isAdmin: session.isAdmin,
     isNuked: user?.is_nuked ?? false,
+    riddle: user?.riddle ?? null,
   })
 })

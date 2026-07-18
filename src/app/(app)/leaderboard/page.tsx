@@ -101,7 +101,7 @@ export default function LeaderboardPage() {
     setTimeout(() => setSplats(prev => prev.filter(s => s.id !== id)), 900)
   }
 
-  useEffect(() => {
+  function fetchLeaderboard() {
     Promise.all([
       fetch('/api/leaderboard').then((r) => r.json()),
       fetch('/api/auth/me').then((r) => r.json()),
@@ -112,6 +112,12 @@ export default function LeaderboardPage() {
         setLoading(false)
       })
       .catch(() => setLoading(false))
+  }
+
+  useEffect(() => {
+    fetchLeaderboard()
+    window.addEventListener('nuke-resist', fetchLeaderboard)
+    return () => window.removeEventListener('nuke-resist', fetchLeaderboard)
   }, [])
 
   if (loading) {
@@ -318,8 +324,7 @@ export default function LeaderboardPage() {
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
-                    textDecoration: entry.is_nuked ? 'line-through' : 'none',
-                    textDecorationColor: 'rgba(239,68,68,0.50)',
+                    textDecoration: entry.is_nuked ? 'line-through rgba(239,68,68,0.50)' : 'none',
                   }}
                 >
                   {entry.username}

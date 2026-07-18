@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Access denied.' }, { status: 401 })
   }
 
-  const { userId } = await req.json()
+  const { userId, riddle, riddleAnswer } = await req.json()
   if (!userId || typeof userId !== 'string') {
     return NextResponse.json({ error: 'userId required.' }, { status: 400 })
   }
@@ -24,10 +24,26 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (user?.is_nuked) {
-    await supabase.from('users').update({ is_nuked: false }).eq('id', userId)
+    // Deactivate — clear nuke and riddle
+    await supabase
+      .from('users')
+      .update({ is_nuked: false, riddle: null, riddle_answer: null })
+      .eq('id', userId)
   } else {
-    await supabase.from('users').update({ is_nuked: false }).eq('is_nuked', true)
-    await supabase.from('users').update({ is_nuked: true }).eq('id', userId)
+    // Clear any existing nuke first
+    await supabase
+      .from('users')
+      .update({ is_nuked: false, riddle: null, riddle_answer: null })
+      .eq('is_nuked', true)
+    // Nuke the target with riddle
+    await supabase
+      .from('users')
+      .update({
+        is_nuked: true,
+        riddle: riddle ?? null,
+        riddle_answer: riddleAnswer ?? null,
+      })
+      .eq('id', userId)
   }
 
   return NextResponse.json({ ok: true })
