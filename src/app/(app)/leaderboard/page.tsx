@@ -258,18 +258,36 @@ export default function LeaderboardPage() {
           </div>
         </>
       )}
-      <h1
-        style={{
-          fontSize: '10px',
-          fontWeight: 600,
-          textTransform: 'uppercase',
-          letterSpacing: '0.18em',
-          color: 'rgba(255,255,255,0.40)',
-          marginBottom: '16px',
-        }}
-      >
-        Leaderboard
-      </h1>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+        <h1
+          style={{
+            fontSize: '10px',
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.18em',
+            color: 'rgba(255,255,255,0.40)',
+            margin: 0,
+          }}
+        >
+          Leaderboard
+        </h1>
+        <a
+          href="/race"
+          style={{
+            fontSize: '10px',
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: '0.12em',
+            color: 'rgba(255,255,255,0.40)',
+            textDecoration: 'none',
+            padding: '5px 10px',
+            border: '1px solid rgba(255,255,255,0.10)',
+            borderRadius: '6px',
+          }}
+        >
+          Race ↗
+        </a>
+      </div>
 
       {entries.length === 0 && (
         <p style={{ color: 'rgba(255,255,255,0.30)', textAlign: 'center', paddingTop: '40px' }}>

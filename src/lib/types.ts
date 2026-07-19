@@ -105,3 +105,31 @@ export const ROUND_LABELS: Record<number, string> = {
   5: 'Third Place',
   6: 'Final',
 }
+
+export interface MatchSlot {
+  match_id: number
+  round_id: number
+  round_name: string
+  kickoff_utc: string
+  is_round_start: boolean
+  home_team_name: string | null
+  away_team_name: string | null
+  home_img_code: string | null
+  away_img_code: string | null
+  home_score: number | null
+  away_score: number | null
+  is_champion_slot: boolean
+  champion_team_name: string | null
+  champion_img_code: string | null
+}
+
+export interface UserMeta {
+  user_id: string
+  username: string
+  cumulative: number[]
+}
+
+export interface PointsHistoryResponse {
+  matches: MatchSlot[]
+  users: UserMeta[]
+}

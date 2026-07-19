@@ -1,20 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { PLAYER_AVATARS } from '@/lib/players'
 
 interface VillainPlayer {
   id: string
   username: string
   is_nuked: boolean
   total_points: number
-}
-
-const AVATARS: Record<string, string> = {
-  'c5056f46-06e1-44b9-9dd4-05aba2c66fc4': '/balta.png',
-  '97718112-fdca-4bc9-9c05-6d3e0d819cdc': '/pelon.png',
-  '6e6d0a29-d2c1-48c3-8661-27375fbe95b8': '/temo.png',
-  '1aa44a7e-544d-4e9f-b8c7-50a1fdfe5322': '/julio.png',
-  '9ee8b864-578f-4ea1-b3e7-88c2769bab7c': '/mickey.png',
 }
 
 const LAST_SEEN: Record<string, string> = {
@@ -346,7 +339,7 @@ export default function VillainPage() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {players.map((player, rank) => {
-              const avatar = AVATARS[player.id]
+              const avatar = PLAYER_AVATARS[player.id]
               const lastSeen = LAST_SEEN[player.id]
               const threat = getThreat(rank)
               const isNuking = nuking === player.id
