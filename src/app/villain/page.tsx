@@ -463,7 +463,7 @@ export default function VillainPage() {
                             : 'none',
                         }}
                       >
-                        {player.is_nuked ? '☠ NUKED' : `▲ ${threat.label}`}
+                        {player.is_nuked ? 'NUKED' : `▲ ${threat.label}`}
                       </span>
                       <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.18)', fontWeight: 500 }}>
                         {player.total_points} pts

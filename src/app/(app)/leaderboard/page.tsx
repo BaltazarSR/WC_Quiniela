@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { SoccerIcon } from '@/components/icons'
 import { getFlagUrl } from '@/lib/flags'
+import { ResistSection } from '@/components/ResistSection'
 import type { LeaderboardEntry } from '@/lib/types'
 
 function ChampionCell({ entry, flagSize = 18, mexicoMode = false }: { entry: LeaderboardEntry; flagSize?: number; mexicoMode?: boolean }) {
@@ -65,6 +66,8 @@ export default function LeaderboardPage() {
   const [loading, setLoading] = useState(true)
   const [mexicoMode, setMexicoMode] = useState(false)
   const [currentUsername, setCurrentUsername] = useState<string | null>(null)
+  const [isNuked, setIsNuked] = useState(false)
+  const [riddle, setRiddle] = useState<string | null>(null)
   const [penalty, setPenalty] = useState(0)
   const [splashed, setSplashed] = useState<Set<number>>(new Set())
   const [splats, setSplats] = useState<Array<{ id: number; x: number; y: number; size: number; dir: string }>>([])
@@ -109,6 +112,8 @@ export default function LeaderboardPage() {
       .then(([leaderboardData, meData]) => {
         setEntries(leaderboardData)
         setCurrentUsername(meData.username ?? null)
+        setIsNuked(meData.isNuked ?? false)
+        setRiddle(meData.riddle ?? null)
         setLoading(false)
       })
       .catch(() => setLoading(false))
@@ -330,8 +335,11 @@ export default function LeaderboardPage() {
                   {entry.username}
                 </span>
                 {entry.is_nuked && (
-                  <span
+                  <div
                     style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '3px',
                       fontSize: '8px',
                       fontWeight: 800,
                       letterSpacing: '0.16em',
@@ -340,8 +348,8 @@ export default function LeaderboardPage() {
                       animation: 'nuke-badge-pulse 1.6s ease-in-out infinite',
                     }}
                   >
-                    ☢ Nuked
-                  </span>
+                    Nuked
+                  </div>
                 )}
               </div>
             </div>
@@ -427,6 +435,12 @@ export default function LeaderboardPage() {
           {mexicoMode ? 'VIVA MÉXICO' : 'IMAGINEMOS COSAS CHINGONAS'}
         </button>
       </div>
+
+      {isNuked && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '24px', paddingBottom: '24px' }}>
+          <ResistSection riddle={riddle} />
+        </div>
+      )}
     </div>
   )
 }
