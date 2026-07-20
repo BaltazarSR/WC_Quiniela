@@ -78,8 +78,11 @@ function MatchEventCard({ slot, index }: { slot: MatchSlot; index: number }) {
     >
       {slot.is_champion_slot ? (
         <>
-          <div style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#fbbf24', marginBottom: '6px' }}>
-            🏆 Campeon
+          <div style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#fbbf24', marginBottom: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="#fbbf24" style={{ flexShrink: 0 }}>
+              <path d="M6.00003 2H18V4H23V5C23 5.04055 23 5.08112 23 5.1217C23.0004 7.01324 23.0008 8.94253 22.2363 10.6344C21.454 12.3657 19.9518 13.7139 17.332 14.7536C16.4812 16.3978 14.8912 17.5998 13 17.917V20H15V22H9.00003V20H11V17.917C9.10883 17.5998 7.51881 16.3978 6.66805 14.7536C4.04822 13.7139 2.54607 12.3657 1.76377 10.6344C0.999303 8.94253 0.999663 7.01324 1.00002 5.1217C1.00002 5.08111 1.00003 5.04055 1.00003 5V4H6.00003V2ZM6.00003 6H3.00417C3.0219 7.55135 3.11415 8.7658 3.58634 9.81082C3.97492 10.6708 4.66399 11.4914 6.00472 12.239C6.0016 12.1597 6.00003 12.08 6.00003 12V6ZM8.00003 4V12C8.00003 12.5594 8.11428 13.0896 8.31978 13.5704C8.93111 15.0008 10.35 16 12 16C13.65 16 15.0689 15.0008 15.6803 13.5704C15.8858 13.0896 16 12.5594 16 12V4H8.00003ZM18 6V12C18 12.08 17.9985 12.1597 17.9953 12.239C19.3361 11.4914 20.0251 10.6708 20.4137 9.81082C20.8859 8.7658 20.9782 7.55135 20.9959 6H18Z" />
+            </svg>
+            Champion
           </div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', fontSize: '14px', fontWeight: 700, color: '#fff' }}>
             <Flag imgCode={slot.champion_img_code} name={slot.champion_team_name} size={18} />
