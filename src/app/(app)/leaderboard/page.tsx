@@ -430,7 +430,7 @@ export default function LeaderboardPage() {
         }}
       >
         <SoccerIcon color="rgba(255,255,255,0.20)" size={11} />
-        Exact score = 3 pts · Correct result = 1 pt · Champion = 15 pts
+        Exact score = 3 pts · Correct result = 1 pt · Champion = 10 pts
       </p>
 
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>

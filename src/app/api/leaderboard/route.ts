@@ -91,7 +91,7 @@ export const GET = withAuth(async () => {
     entry.champion_team_img_code = teamField?.img_code ?? null
     if (champTeamId != null) {
       entry.champion_correct = cp.team_id === champTeamId
-      if (entry.champion_correct) entry.total_points += 15
+      if (entry.champion_correct) entry.total_points += 10
     }
   }
 

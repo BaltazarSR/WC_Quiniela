@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
   // Add champion bonus
   for (const cp of champPreds ?? []) {
     if (champTeamId != null && cp.team_id === champTeamId) {
-      pointsMap.set(cp.user_id, (pointsMap.get(cp.user_id) ?? 0) + 15)
+      pointsMap.set(cp.user_id, (pointsMap.get(cp.user_id) ?? 0) + 10)
     }
   }
 

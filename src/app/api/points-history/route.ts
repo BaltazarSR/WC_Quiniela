@@ -119,7 +119,7 @@ export const GET = withAuth(async () => {
     for (const slot of slots) {
       if (slot.is_champion_slot) {
         const cp = (champPreds ?? []).find((c) => c.user_id === userId)
-        if (cp && cp.team_id === champTeamId) running += 15
+        if (cp && cp.team_id === champTeamId) running += 10
       } else {
         running += predMap.get(slot.match_id)?.get(userId) ?? 0
       }

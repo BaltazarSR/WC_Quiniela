@@ -141,7 +141,7 @@ export function ChampionCard() {
             }}
           >
             <SoccerIcon color="#4ade80" size={10} />
-            +15 pts
+            +10 pts
           </span>
         ) : champDecided ? (
           <span
